@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hotelbox Scraper — Data Viewer</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --panel: #ffffff;
+    --border: #e2e4e9;
+    --text: #1c1f26;
+    --muted: #6b7280;
+    --accent: #2f5fdd;
+    --chip: #eef1f8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  header {
+    padding: 14px 20px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  header .sub { font-size: 12px; color: var(--muted); }
+
+  .layout { display: flex; min-height: calc(100vh - 53px); }
+
+  .filters {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 16px;
+  }
+  .filters label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin: 14px 0 4px;
+  }
+  .filters label:first-child { margin-top: 0; }
+  .filters select, .filters input {
+    width: 100%;
+    padding: 7px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    background: #fff;
+  }
+  .filters button {
+    margin-top: 16px;
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .filters button.secondary {
+    margin-top: 6px;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  main { flex: 1; padding: 18px 22px; }
+  .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .toolbar .count { font-size: 13px; color: var(--muted); }
+  .pager { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+  .pager button {
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .pager button:disabled { opacity: 0.4; cursor: default; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.15s;
+  }
+  .card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+  .card .thumb {
+    width: 100%;
+    height: 130px;
+    background: #eceef2 center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .card .body { padding: 10px 12px; }
+  .card .name { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; line-height: 1.3; }
+  .card .loc { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .card .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge { font-size: 11px; background: var(--chip); color: var(--accent); padding: 2px 6px; border-radius: 5px; }
+
+  .empty { color: var(--muted); font-size: 13px; padding: 40px 0; text-align: center; }
+
+  /* modal */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(15,17,22,0.55);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 30px 16px; overflow-y: auto; z-index: 50;
+  }
+  .overlay[hidden] { display: none; }
+  .modal {
+    background: var(--panel); border-radius: 12px; max-width: 820px; width: 100%;
+    padding: 22px 26px 28px; position: relative;
+  }
+  .modal .close {
+    position: absolute; top: 14px; right: 16px; border: none; background: none;
+    font-size: 20px; cursor: pointer; color: var(--muted);
+  }
+  .modal h2 { margin: 0 0 4px; font-size: 20px; }
+  .modal .loc { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+  .modal .badges { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .modal section { margin-top: 18px; }
+  .modal section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 8px; }
+  .modal p { font-size: 13.5px; line-height: 1.55; margin: 0; }
+  .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 8px; font-size: 13px; }
+  .facts div span { display: block; color: var(--muted); font-size: 11px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: 12px; background: var(--chip); padding: 4px 8px; border-radius: 12px; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px,1fr)); gap: 8px; }
+  .gallery img { width: 100%; height: 80px; object-fit: cover; border-radius: 6px; cursor: zoom-in; background: #eceef2; }
+  .room-card { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+  .room-card h4 { margin: 0 0 4px; font-size: 13.5px; }
+  .room-card .meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .room-card .gallery img { height: 60px; }
+
+  .lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex;
+    align-items: center; justify-content: center; z-index: 100; cursor: zoom-out;
+  }
+  .lightbox[hidden] { display: none; }
+  .lightbox img { max-width: 92vw; max-height: 92vh; border-radius: 6px; }
+
+  .loading { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Hotelbox Scraper — Data Viewer</h1>
+    <div class="sub">Read-only browser over the scraped catalog</div>
+  </div>
+  <div class="sub" id="dbSummary"></div>
+</header>
+
+<div class="layout">
+  <aside class="filters">
+    <label for="countrySel">Country</label>
+    <select id="countrySel"><option value="">All countries</option></select>
+
+    <label for="stateSel">State</label>
+    <select id="stateSel"><option value="">All states</option></select>
+
+    <label for="citySel">City</label>
+    <select id="citySel"><option value="">All cities</option></select>
+
+    <label for="qInput">Search name</label>
+    <input id="qInput" type="text" placeholder="e.g. Taj, Marriott..." />
+
+    <button id="applyBtn">Apply filters</button>
+    <button id="resetBtn" class="secondary">Reset</button>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <div class="count" id="resultCount"></div>
+      <div class="pager">
+        <button id="prevBtn">&larr; Prev</button>
+        <span id="pageLabel"></span>
+        <button id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+
+    <div id="grid" class="grid"></div>
+    <div id="emptyState" class="empty" hidden>No hotels match these filters.</div>
+    <div id="loadingState" class="loading" hidden>Loading…</div>
+  </main>
+</div>
+
+<div class="overlay" id="modalOverlay" hidden>
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<div class="lightbox" id="lightbox" hidden>
+  <img id="lightboxImg" src="" alt="" />
+</div>
+
+<script>
+const api = (path) => fetch(path).then((r) => {
+  if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+  return r.json();
+});
+
+const state = { countryId: '', stateId: '', cityId: '', q: '', page: 1, limit: 24, total: 0 };
+
+const el = (id) => document.getElementById(id);
+
+function fmtRating(v) { return v === null || v === undefined ? '—' : Number(v).toFixed(1); }
+
+async function loadCountries() {
+  const countries = await api('/catalog/countries');
+  el('countrySel').innerHTML = '<option value="">All countries</option>' +
+    countries.map((c) => `<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+async function loadStates(countryId) {
+  const states = countryId ? await api('/catalog/states?countryId=' + countryId) : [];
+  el('stateSel').innerHTML = '<option value="">All states</option>' +
+    states.map((s) => `<option value="${s.id}">${s.name}</option>`).join('');
+}
+
+async function loadCities(stateId, countryId) {
+  const params = new URLSearchParams();
+  if (stateId) params.set('stateId', stateId);
+  if (!stateId && countryId) params.set('countryId', countryId);
+  const cities = (stateId || countryId) ? await api('/catalog/cities?' + params.toString()) : [];
+  el('citySel').innerHTML = '<option value="">All cities</option>' +
+    cities.map((c) => `<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+el('countrySel').addEventListener('change', async (e) => {
+  await loadStates(e.target.value);
+  await loadCities('', e.target.value);
+});
+el('stateSel').addEventListener('change', async (e) => {
+  await loadCities(e.target.value, el('countrySel').value);
+});
+
+el('applyBtn').addEventListener('click', () => {
+  state.countryId = el('countrySel').value;
+  state.stateId = el('stateSel').value;
+  state.cityId = el('citySel').value;
+  state.q = el('qInput').value.trim();
+  state.page = 1;
+  fetchHotels();
+});
+
+el('resetBtn').addEventListener('click', () => {
+  el('countrySel').value = '';
+  el('stateSel').innerHTML = '<option value="">All states</option>';
+  el('citySel').innerHTML = '<option value="">All cities</option>';
+  el('qInput').value = '';
+  Object.assign(state, { countryId: '', stateId: '', cityId: '', q: '', page: 1 });
+  fetchHotels();
+});
+
+el('qInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') el('applyBtn').click(); });
+
+el('prevBtn').addEventListener('click', () => { if (state.page > 1) { state.page--; fetchHotels(); } });
+el('nextBtn').addEventListener('click', () => {
+  if (state.page * state.limit < state.total) { state.page++; fetchHotels(); }
+});
+
+function renderCard(h) {
+  const thumb = h.primary_photo_url
+    ? `<div class="thumb" style="background-image:url('${h.primary_photo_url}')"></div>`
+    : `<div class="thumb">No photo</div>`;
+  const loc = [h.city_name, h.state_name, h.country_name].filter(Boolean).join(', ') || '—';
+  return `
+    <div class="card" data-id="${h.id}">
+      ${thumb}
+      <div class="body">
+        <div class="name">${h.name}</div>
+        <div class="loc">${loc}</div>
+        <div class="badges">
+          <span class="badge">★ ${fmtRating(h.star_rating)}</span>
+          <span class="badge">Guest ${fmtRating(h.guest_rating)} (${h.review_count ?? 0})</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function fetchHotels() {
+  el('loadingState').hidden = false;
+  el('emptyState').hidden = true;
+  el('grid').innerHTML = '';
+
+  const params = new URLSearchParams();
+  if (state.countryId) params.set('countryId', state.countryId);
+  if (state.stateId) params.set('stateId', state.stateId);
+  if (state.cityId) params.set('cityId', state.cityId);
+  if (state.q) params.set('q', state.q);
+  params.set('page', state.page);
+  params.set('limit', state.limit);
+
+  const { hotels, total } = await api('/catalog/hotels?' + params.toString());
+  state.total = total;
+  el('loadingState').hidden = true;
+
+  if (hotels.length === 0) {
+    el('emptyState').hidden = false;
+  } else {
+    el('grid').innerHTML = hotels.map(renderCard).join('');
+    el('grid').querySelectorAll('.card').forEach((card) => {
+      card.addEventListener('click', () => openHotel(card.dataset.id));
+    });
+  }
+
+  const from = total === 0 ? 0 : (state.page - 1) * state.limit + 1;
+  const to = Math.min(state.page * state.limit, total);
+  el('resultCount').textContent = `${total} hotel${total === 1 ? '' : 's'} — showing ${from}-${to}`;
+  el('pageLabel').textContent = `Page ${state.page}`;
+  el('prevBtn').disabled = state.page <= 1;
+  el('nextBtn').disabled = state.page * state.limit >= total;
+}
+
+function renderGallery(media, small) {
+  if (!media || media.length === 0) return '<p style="color:var(--muted)">No photos.</p>';
+  return `<div class="gallery">${media.map((m) =>
+    `<img src="${m.media_url}" loading="lazy" onclick="openLightbox('${m.media_url}', event)" />`
+  ).join('')}</div>`;
+}
+
+function renderRoom(room) {
+  const facts = [
+    room.bed_type ? `${room.bed_type}` : null,
+    room.bed_count ? `${room.bed_count} bed(s)` : null,
+    room.max_occupancy ? `Sleeps ${room.max_occupancy}` : null,
+    room.area_sqm ? `${room.area_sqm} sqm` : null,
+  ].filter(Boolean).join(' · ');
+
+  return `
+    <div class="room-card">
+      <h4>${room.room_name}</h4>
+      <div class="meta">${facts || '—'}</div>
+      ${room.description ? `<p style="margin-bottom:8px">${room.description}</p>` : ''}
+      ${room.amenities && room.amenities.length ? `<div class="chips" style="margin-bottom:8px">${room.amenities.map((a) => `<span class="chip">${a}</span>`).join('')}</div>` : ''}
+      ${renderGallery(room.media, true)}
+    </div>`;
+}
+
+async function openHotel(id) {
+  el('modalBody').innerHTML = '<div class="loading">Loading hotel…</div>';
+  el('modalOverlay').hidden = false;
+
+  const h = await api('/catalog/hotels/' + id);
+  const loc = [h.city_name, h.state_name, h.country_name].filter(Boolean).join(', ') || '—';
+  const facts = [
+    ['Check-in', h.check_in_time], ['Check-out', h.check_out_time],
+    ['Phone', h.phone], ['Address', [h.address_line1, h.address_line2].filter(Boolean).join(', ')],
+    ['Postal code', h.postal_code], ['Pet policy', h.pet_policy],
+  ].filter(([, v]) => v);
+
+  el('modalBody').innerHTML = `
+    <button class="close" onclick="closeModal()">&times;</button>
+    <h2>${h.name}</h2>
+    <div class="loc">${loc}</div>
+    <div class="badges">
+      <span class="badge">★ ${fmtRating(h.star_rating)}</span>
+      <span class="badge">Guest ${fmtRating(h.guest_rating)} (${h.review_count ?? 0} reviews)</span>
+      ${h.property_type ? `<span class="badge">${h.property_type}</span>` : ''}
+    </div>
+    ${h.full_description || h.short_description ? `<section><h3>Description</h3><p>${h.full_description || h.short_description}</p></section>` : ''}
+    ${facts.length ? `<section><h3>Details</h3><div class="facts">${facts.map(([k, v]) => `<div><span>${k}</span>${v}</div>`).join('')}</div></section>` : ''}
+    ${h.amenities && h.amenities.length ? `<section><h3>Amenities (${h.amenities.length})</h3><div class="chips">${h.amenities.map((a) => `<span class="chip">${a}</span>`).join('')}</div></section>` : ''}
+    <section><h3>Photos (${(h.media || []).length})</h3>${renderGallery(h.media)}</section>
+    <section><h3>Rooms (${(h.rooms || []).length})</h3>${(h.rooms || []).map(renderRoom).join('') || '<p style="color:var(--muted)">No rooms recorded.</p>'}</section>
+  `;
+}
+
+function closeModal() { el('modalOverlay').hidden = true; }
+el('modalOverlay').addEventListener('click', (e) => { if (e.target === el('modalOverlay')) closeModal(); });
+
+function openLightbox(url, evt) {
+  evt.stopPropagation();
+  el('lightboxImg').src = url;
+  el('lightbox').hidden = false;
+}
+el('lightbox').addEventListener('click', () => { el('lightbox').hidden = true; });
+
+(async function init() {
+  await loadCountries();
+  await fetchHotels();
+  try {
+    const countries = await api('/catalog/countries');
+    el('dbSummary').textContent = `${countries.length} countr${countries.length === 1 ? 'y' : 'ies'} seeded`;
+  } catch (_) { /* non-critical */ }
+})();
+</script>
+</body>
+</html>
