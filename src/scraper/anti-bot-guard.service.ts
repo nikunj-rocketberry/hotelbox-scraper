@@ -65,6 +65,11 @@ export class AntiBotGuardService implements OnModuleDestroy {
     this.logger.warn(`Anti-bot block detected (${reason}) — cooling down ALL workers for ${this.cooldownMs / 1000}s`);
   }
 
+  async clearBlock(): Promise<void> {
+    await this.redis.del(BLOCKED_UNTIL_KEY);
+    this.logger.log('Active anti-bot cooldown cleared from Redis.');
+  }
+
   /** Call after every page.goto() with the response status + page content. Returns the detected reason, or null if clean. */
   async checkPage(page: Page, responseStatus: number | undefined): Promise<string | null> {
     if (responseStatus === 429) return this.trip('http-429');

@@ -1,0 +1,131 @@
+- generic [ref=f113e5]:
+  - banner [ref=f113e7]:
+    - generic [ref=f113e11]:
+      - link [ref=f113e12] [cursor=pointer]:
+        - /url: https://www.expedia.co.in/
+        - img "Expedia logo" [ref=f113e13]
+      - button [ref=f113e18] [cursor=pointer]:
+        - generic [aria-hidden] [ref=f113e19]: Shop travel
+        - img "Shop travel" [ref=f113e20]
+      - list [ref=f113e22]:
+        - listitem [ref=f113e23]:
+          - link "Open app" [ref=f113e25] [cursor=pointer]:
+            - /url: https://expe.onelink.me/hnLd?pid=BRAND&af_adset=EXPEDIA-IN&c=MAD-NAVBAR-NAVPILL&af_ad=DIRECT.WEB_NULL_REFERRAL&af_web_dp=https%3A%2F%2Fwww.expedia.co.in%2Fapp&af_siteid=27&af_sub_siteid=page.Hotels.Infosite.Information&custom_web_attribute=cea4ce20-b078-4907-9175-202f4cdb4464&af_sub1=cea4ce20-b078-4907-9175-202f4cdb4464&m_dev_type=DESKTOP&m_user_state=ANON&deep_link_value=https%3A%2F%2Fwww.expedia.co.in%2FBengaluru-Hotels-Hyatt-Centric-MG-Road-Bangalore.h1531574.Hotel-Information%3Fchkin%3D2026-10-08%26chkout%3D2026-10-10
+        - listitem [ref=f113e31]:
+          - button "INR India" [ref=f113e32] [cursor=pointer]:
+            - generic [ref=f113e33]: INR
+            - generic [aria-hidden] [ref=f113e35]: •
+            - img "India" [ref=f113e36]
+        - listitem [ref=f113e37]:
+          - link "List your property" [ref=f113e38] [cursor=pointer]:
+            - /url: https://apps.expediapartnercentral.com/en_GB/list?utm_medium=referral&utm_source=wwwexpediacoin-en_GB&utm_campaign=Brand.DTI&utm_contentewd=pwa-header-btn&siteId=27&tpid=27&eapid=0&langId=2057&utm_term=Brand.DTI&lasttouchMktgcode=Brand.DTI
+        - listitem [ref=f113e39]:
+          - link "Support" [ref=f113e40] [cursor=pointer]:
+            - /url: /helpcenter/
+        - listitem [ref=f113e41]:
+          - link "Trips" [ref=f113e42] [cursor=pointer]:
+            - /url: /trips
+        - listitem [ref=f113e43]:
+          - link [ref=f113e45] [cursor=pointer]:
+            - /url: /inbox/notifications
+            - img "Communication Center" [ref=f113e47]
+        - listitem [ref=f113e50]:
+          - button "Sign in" [ref=f113e54] [cursor=pointer]
+  - main [ref=f113e56]:
+    - generic [ref=f113e59]:
+      - generic [ref=f113e64]:
+        - generic [ref=f113e71]:
+          - generic [ref=f113e73]:
+            - button "Share" [ref=f113e78] [cursor=pointer]:
+              - img "Share button" [ref=f113e79]
+            - generic [ref=f113e85]:
+              - generic [ref=f113e87]:
+                - heading "Photo gallery for Hyatt Centric MG Road Bangalore" [level=2] [ref=f113e88]
+                - figure [ref=f113e89]:
+                  - generic:
+                    - img "An interior space with a brick wall, wooden ceiling, and a dining area with tables and chairs." [ref=f113e91]
+                    - button "Restaurant" [ref=f113e92] [cursor=pointer]
+                - figure [ref=f113e95]:
+                  - generic:
+                    - img "A modern interior with a reception desk, seating area with tables and chairs, and a bookshelf with various items." [ref=f113e97]
+                    - button "Lobby" [ref=f113e98] [cursor=pointer]
+                - figure [ref=f113e101]:
+                  - generic:
+                    - img "A person relaxing on a lounge chair with a table of food and drinks in front of them, overlooking a lush landscape." [ref=f113e103]
+                    - button "Room" [ref=f113e104] [cursor=pointer]
+                - figure [ref=f113e107]:
+                  - generic:
+                    - img "A modern lounge area with a leather sofa, blue chairs, and a coffee table. There are shelves with decorative items and plants." [ref=f113e109]
+                    - button "Restaurant" [ref=f113e110] [cursor=pointer]
+                - figure [ref=f113e113]:
+                  - generic:
+                    - img "A swimming pool with tiled flooring, surrounded by lounge chairs and potted plants." [ref=f113e115]
+                    - button "Pool" [ref=f113e116] [cursor=pointer]
+              - button "Show all 87 images" [ref=f113e121] [cursor=pointer]: 87+
+          - list [ref=f113e134]:
+            - listitem [ref=f113e135] [cursor=pointer]:
+              - link "Overview" [ref=f113e136]:
+                - /url: "#Overview"
+            - listitem [ref=f113e138] [cursor=pointer]:
+              - link "About" [ref=f113e139]:
+                - /url: "#About"
+            - listitem [ref=f113e141] [cursor=pointer]:
+              - link "Rooms" [ref=f113e142]:
+                - /url: "#Offers"
+            - listitem [ref=f113e144] [cursor=pointer]:
+              - link "Policies" [ref=f113e145]:
+                - /url: "#Policies"
+            - listitem [ref=f113e147] [cursor=pointer]:
+              - link "Accessibility" [ref=f113e148]:
+                - /url: "#Accessibility"
+            - listitem [aria-hidden] [ref=f113e150]
+        - generic [ref=f113e154]:
+          - generic [ref=f113e157]:
+            - generic [ref=f113e158]:
+              - generic [ref=f113e161]:
+                - generic [ref=f113e163]:
+                  - generic [ref=f113e164]:
+                    - generic [ref=f113e165]: Luxury
+                    - generic [ref=f113e168]:
+                      - generic [ref=f113e169]: "Property class: 5 and above"
+                      - button "More information about this property class rating" [ref=f113e181] [cursor=pointer]
+                  - heading "Hyatt Centric MG Road Bangalore" [level=1] [ref=f113e186]
+                - generic [ref=f113e191]:
+                  - heading "Luxury hotel near M.G. Road" [level=3] [ref=f113e193]
+                  - paragraph [ref=f113e197]: At Hyatt Centric MG Road Bangalore, you can look forward to a poolside bar, a terrace and a shopping centre on-site. Treat yourself to a massage at the on-site spa. The on-site restaurant, The Bengaluru Brasserie, offers breakfast, lunch, dinner, light fare and al fresco dining. Free in-room WiFi is available to all guests, along with a coffee shop/cafe and a garden.
+              - figure [ref=f113e202]
+            - figure [ref=f113e217]
+          - generic [ref=f113e236]:
+            - generic [ref=f113e239]:
+              - heading "Change Search" [level=3] [ref=f113e240]
+              - generic [ref=f113e241]:
+                - generic [ref=f113e244]:
+                  - generic [ref=f113e246]:
+                    - generic: Start date
+                    - button "Start date, 8 Oct" [ref=f113e247] [cursor=pointer]: 8 Oct
+                  - generic [ref=f113e249]:
+                    - generic: End date
+                    - button "End date, 10 Oct" [ref=f113e250] [cursor=pointer]: 10 Oct
+                - generic [ref=f113e252]:
+                  - generic: Travellers
+                  - textbox "Travellers" [ref=f113e253]: "2"
+            - generic [ref=f113e255]:
+              - generic [ref=f113e256]:
+                - group "1 out of 4" [ref=f113e257]:
+                  - figure [ref=f113e261]
+                - group "2 out of 4" [ref=f113e263]:
+                  - figure [ref=f113e267]
+                - group [aria-hidden] [ref=f113e269]:
+                  - figure [ref=f113e273]
+                - group [aria-hidden] [ref=f113e275]:
+                  - figure [ref=f113e279]
+              - generic:
+                - button [aria-hidden]
+                - button "next":
+                  - img "next"
+          - figure [ref=f113e290]
+      - generic [ref=f113e295]:
+        - generic:
+          - generic:
+            - document
+  - generic [ref=f113e302]: Loading

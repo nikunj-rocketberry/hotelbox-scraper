@@ -1,0 +1,599 @@
+- generic [active] [ref=f88e1]:
+  - generic [ref=f88e5]:
+    - banner [ref=f88e7]:
+      - generic [ref=f88e11]:
+        - link [ref=f88e12] [cursor=pointer]:
+          - /url: https://www.expedia.co.in/
+          - img "Expedia logo" [ref=f88e13]
+        - button [ref=f88e18] [cursor=pointer]:
+          - generic [aria-hidden] [ref=f88e19]: Shop travel
+          - img "Shop travel" [ref=f88e20]
+        - list [ref=f88e22]:
+          - listitem [ref=f88e23]:
+            - link "Open app" [ref=f88e25] [cursor=pointer]:
+              - /url: https://expe.onelink.me/hnLd?pid=BRAND&af_adset=EXPEDIA-IN&c=MAD-NAVBAR-NAVPILL&af_ad=DIRECT.WEB_NULL_REFERRAL&af_web_dp=https%3A%2F%2Fwww.expedia.co.in%2Fapp&af_siteid=27&af_sub_siteid=page.Hotel-Search&custom_web_attribute=cea4ce20-b078-4907-9175-202f4cdb4464&af_sub1=cea4ce20-b078-4907-9175-202f4cdb4464&m_dev_type=DESKTOP&m_user_state=ANON&deep_link_value=https%3A%2F%2Fwww.expedia.co.in%2FHotel-Search%3Fdestination%3DBengaluru%252C%2520Karnataka%252C%2520India%26d1%3D2026-10-08%26startDate%3D2026-10-08%26d2%3D2026-10-10%26endDate%3D2026-10-10%26adults%3D2%26rooms%3D1%26sort%3DRECOMMENDED%26regionId%3D622%26theme%3D%26userIntent%3D%26semdtl%3D%26categorySearch%3D%26useRewards%3Dfalse
+          - listitem [ref=f88e31]:
+            - button "INR India" [ref=f88e32] [cursor=pointer]:
+              - generic [ref=f88e33]: INR
+              - generic [aria-hidden] [ref=f88e35]: •
+              - img "India" [ref=f88e36]
+          - listitem [ref=f88e37]:
+            - link "List your property" [ref=f88e38] [cursor=pointer]:
+              - /url: https://apps.expediapartnercentral.com/en_GB/list?utm_medium=referral&utm_source=wwwexpediacoin-en_GB&utm_campaign=Brand.DTI&utm_contentewd=pwa-header-btn&siteId=27&tpid=27&eapid=0&langId=2057&utm_term=Brand.DTI&lasttouchMktgcode=Brand.DTI
+          - listitem [ref=f88e39]:
+            - link "Support" [ref=f88e40] [cursor=pointer]:
+              - /url: /helpcenter/
+          - listitem [ref=f88e41]:
+            - link "Trips" [ref=f88e42] [cursor=pointer]:
+              - /url: /trips
+          - listitem [ref=f88e43]:
+            - link [ref=f88e45] [cursor=pointer]:
+              - /url: /inbox/notifications
+              - img "Communication Center" [ref=f88e47]
+          - listitem [ref=f88e50]:
+            - button "Sign in" [ref=f88e54] [cursor=pointer]
+    - main [ref=f88e56]:
+      - generic [ref=f88e57]:
+        - heading "495 Properties in Bengaluru, Karnataka, India. 8 October 2026 through 10 October 2026" [level=1] [ref=f88e58]
+        - generic [ref=f88e62]:
+          - generic [ref=f88e70]:
+            - generic [ref=f88e77]:
+              - generic: Where to?
+              - textbox "Where to?. Results available." [ref=f88e78]:
+                - /placeholder: Where to?
+                - text: Bengaluru, Karnataka, India
+            - generic [ref=f88e84]:
+              - generic: Dates
+              - button "Dates, Thu 8 Oct - Sat 10 Oct" [ref=f88e85] [cursor=pointer]: Thu 8 Oct - Sat 10 Oct
+            - generic [ref=f88e89]:
+              - generic: Travellers
+              - button "Travellers, 2 travellers, 1 room" [ref=f88e90] [cursor=pointer]: 2 travellers, 1 room
+            - button "Search" [ref=f88e92] [cursor=pointer]:
+              - img "Search" [ref=f88e93]
+          - generic [ref=f88e97]:
+            - generic [ref=f88e98]:
+              - generic [ref=f88e100]:
+                - figure [ref=f88e101]:
+                  - img "static map image" [ref=f88e103]
+                  - button [aria-hidden] [ref=f88e104] [cursor=pointer]:
+                    - generic [ref=f88e105]: static map image
+                - button "View in a map" [ref=f88e107] [cursor=pointer]
+              - heading "Sort & filter" [level=2] [ref=f88e108]
+              - generic [ref=f88e110]:
+                - generic [ref=f88e113]:
+                  - checkbox "Compare properties" [ref=f88e114] [cursor=pointer]
+                  - generic [ref=f88e117] [cursor=pointer]:
+                    - text: Compare properties
+                    - paragraph [ref=f88e118]: Get a side-by-side view of up to 5 properties.
+                - generic [ref=f88e119]:
+                  - heading "Search by property name" [level=2] [ref=f88e121]
+                  - generic [ref=f88e125]:
+                    - generic [ref=f88e126]:
+                      - generic: e.g. Marriott
+                      - button "Search by property name" [ref=f88e127] [cursor=pointer]
+                    - generic: e.g. Marriott
+                - generic [ref=f88e128]:
+                  - heading "Filter by" [level=2] [ref=f88e130]
+                  - group [ref=f88e133]:
+                    - heading "Nightly price" [level=3] [ref=f88e135]
+                    - generic [ref=f88e136]:
+                      - generic [ref=f88e138]:
+                        - generic [ref=f88e139]:
+                          - generic: Min
+                          - textbox "₹840, Minimum, Nightly price" [ref=f88e140]: ₹840
+                        - generic [ref=f88e141]:
+                          - generic: Max
+                          - textbox "₹11,300 and above, Maximum, Nightly price" [ref=f88e142]: ₹11,300+
+                      - generic [ref=f88e196]:
+                        - slider "₹840, Minimum, Nightly price" [ref=f88e198] [cursor=pointer]: "840"
+                        - slider "₹11,300 and above, Maximum, Nightly price" [ref=f88e200] [cursor=pointer]: "11300"
+                  - group [ref=f88e203]:
+                    - heading "Popular filters" [level=3] [ref=f88e206]
+                    - generic [ref=f88e209]:
+                      - 'checkbox "Popular filters: Bengaluru (BLR-Kempegowda Intl.) (212)" [ref=f88e210] [cursor=pointer]'
+                      - paragraph [ref=f88e213] [cursor=pointer]: Bengaluru (BLR-Kempegowda Intl.) (212)
+                    - generic [ref=f88e216]:
+                      - 'checkbox "Popular filters: Breakfast included (783)" [ref=f88e217] [cursor=pointer]'
+                      - paragraph [ref=f88e220] [cursor=pointer]: Breakfast included (783)
+                    - generic [ref=f88e223]:
+                      - 'checkbox "Popular filters: Reserve now, pay later" [ref=f88e224] [cursor=pointer]'
+                      - paragraph [ref=f88e227] [cursor=pointer]: Reserve now, pay later
+                    - generic [ref=f88e230]:
+                      - 'checkbox "Popular filters: Hotel (1041)" [ref=f88e231] [cursor=pointer]'
+                      - paragraph [ref=f88e234] [cursor=pointer]: Hotel (1041)
+                    - generic [ref=f88e237]:
+                      - 'checkbox "Popular filters: Resort (23)" [ref=f88e238] [cursor=pointer]'
+                      - paragraph [ref=f88e241] [cursor=pointer]: Resort (23)
+                  - generic [ref=f88e244]:
+                    - heading "Neighbourhood" [level=3] [ref=f88e245]
+                    - group "Making a selection from this group results in this page refreshing to show relevant results" [ref=f88e246]:
+                      - generic [ref=f88e248]:
+                        - generic [ref=f88e250]:
+                          - generic [ref=f88e255] [cursor=pointer]:
+                            - radio "Bengaluru (1148)" [checked] [ref=f88e256]
+                            - generic [ref=f88e257]: Bengaluru (1148)
+                          - generic [ref=f88e262] [cursor=pointer]:
+                            - radio "Bengaluru (and vicinity) (1249)" [ref=f88e263]
+                            - generic [ref=f88e264]: Bengaluru (and vicinity) (1249)
+                          - generic [ref=f88e269] [cursor=pointer]:
+                            - radio "Bengaluru (BLR-Kempegowda Intl.) (212)" [ref=f88e270]
+                            - generic [ref=f88e271]: Bengaluru (BLR-Kempegowda Intl.) (212)
+                        - 'button "See more: Neighbourhood" [ref=f88e273] [cursor=pointer]': See more
+                  - group [ref=f88e276]:
+                    - heading "Payment type" [level=3] [ref=f88e279]
+                    - generic [ref=f88e282]:
+                      - 'checkbox "Payment type: Reserve now, pay later" [ref=f88e283] [cursor=pointer]'
+                      - paragraph [ref=f88e286] [cursor=pointer]: Reserve now, pay later
+                  - group [ref=f88e289]:
+                    - heading "Property cancellation options" [level=3] [ref=f88e292]
+                    - generic [ref=f88e295]:
+                      - 'checkbox "Property cancellation options: Fully refundable property" [ref=f88e296] [cursor=pointer]'
+                      - paragraph [ref=f88e299] [cursor=pointer]: Fully refundable property
+                  - group "Property class" [ref=f88e302]:
+                    - generic [ref=f88e304]:
+                      - heading "Property class" [level=3] [ref=f88e306]
+                      - heading [level=3] [aria-hidden] [ref=f88e307]: From
+                    - generic [ref=f88e308]:
+                      - generic [ref=f88e310]:
+                        - generic [ref=f88e311]:
+                          - generic [ref=f88e313]:
+                            - 'checkbox "Property class: Property class: 5 (48)" [ref=f88e314] [cursor=pointer]'
+                            - paragraph [ref=f88e317] [cursor=pointer]: "Property class: 5 (48)"
+                          - generic [ref=f88e318]: ₹6,764
+                        - generic [ref=f88e319]:
+                          - generic [ref=f88e321]:
+                            - 'checkbox "Property class: Property class: 4 (93)" [ref=f88e322] [cursor=pointer]'
+                            - paragraph [ref=f88e325] [cursor=pointer]: "Property class: 4 (93)"
+                          - generic [ref=f88e326]: ₹1,280
+                        - generic [ref=f88e327]:
+                          - generic [ref=f88e329]:
+                            - 'checkbox "Property class: Property class: 3 (740)" [ref=f88e330] [cursor=pointer]'
+                            - paragraph [ref=f88e333] [cursor=pointer]: "Property class: 3 (740)"
+                          - generic [ref=f88e334]: ₹1,040
+                      - 'button "See more: Property class" [ref=f88e336] [cursor=pointer]': See more
+                  - group "Property type" [ref=f88e339]:
+                    - generic [ref=f88e341]:
+                      - heading "Property type" [level=3] [ref=f88e343]
+                      - heading [level=3] [aria-hidden] [ref=f88e344]: From
+                    - generic [ref=f88e345]:
+                      - generic [ref=f88e347]:
+                        - generic [ref=f88e348]:
+                          - generic [ref=f88e350]:
+                            - 'checkbox "Property type: Hotel (1041)" [ref=f88e351] [cursor=pointer]'
+                            - paragraph [ref=f88e354] [cursor=pointer]: Hotel (1041)
+                          - generic [ref=f88e355]: ₹850
+                        - generic [ref=f88e356]:
+                          - generic [ref=f88e358]:
+                            - 'checkbox "Property type: Resort (23)" [ref=f88e359] [cursor=pointer]'
+                            - paragraph [ref=f88e362] [cursor=pointer]: Resort (23)
+                          - generic [ref=f88e363]: ₹4,000
+                        - generic [ref=f88e364]:
+                          - generic [ref=f88e366]:
+                            - 'checkbox "Property type: Aparthotel (27)" [ref=f88e367] [cursor=pointer]'
+                            - paragraph [ref=f88e370] [cursor=pointer]: Aparthotel (27)
+                          - generic [ref=f88e371]: ₹1,280
+                      - 'button "See more: Property type" [ref=f88e373] [cursor=pointer]': See more
+                  - group [ref=f88e376]:
+                    - heading "Property brand" [level=3] [ref=f88e379]
+                    - generic [ref=f88e380]:
+                      - generic [ref=f88e382]:
+                        - generic [ref=f88e385]:
+                          - 'checkbox "Property brand: Fabhotels (110)" [ref=f88e386] [cursor=pointer]'
+                          - paragraph [ref=f88e389] [cursor=pointer]: Fabhotels (110)
+                        - generic [ref=f88e392]:
+                          - 'checkbox "Property brand: Treebo Hotels (42)" [ref=f88e393] [cursor=pointer]'
+                          - paragraph [ref=f88e396] [cursor=pointer]: Treebo Hotels (42)
+                        - generic [ref=f88e399]:
+                          - 'checkbox "Property brand: Belvilla by OYO (38)" [ref=f88e400] [cursor=pointer]'
+                          - paragraph [ref=f88e403] [cursor=pointer]: Belvilla by OYO (38)
+                      - 'button "See more: Property brand" [ref=f88e405] [cursor=pointer]': See more
+                  - group [ref=f88e408]:
+                    - heading "Property amenities" [level=3] [ref=f88e411]
+                    - generic [ref=f88e412]:
+                      - generic [ref=f88e414]:
+                        - generic [ref=f88e417]:
+                          - 'checkbox "Property amenities: Airport shuttle included (14)" [ref=f88e418] [cursor=pointer]'
+                          - paragraph [ref=f88e421] [cursor=pointer]: Airport shuttle included (14)
+                        - generic [ref=f88e424]:
+                          - 'checkbox "Property amenities: Pool (197)" [ref=f88e425] [cursor=pointer]'
+                          - paragraph [ref=f88e428] [cursor=pointer]: Pool (197)
+                        - generic [ref=f88e431]:
+                          - 'checkbox "Property amenities: Wi-Fi included (1194)" [ref=f88e432] [cursor=pointer]'
+                          - paragraph [ref=f88e435] [cursor=pointer]: Wi-Fi included (1194)
+                        - generic [ref=f88e438]:
+                          - 'checkbox "Property amenities: Gym (223)" [ref=f88e439] [cursor=pointer]'
+                          - paragraph [ref=f88e442] [cursor=pointer]: Gym (223)
+                        - generic [ref=f88e445]:
+                          - 'checkbox "Property amenities: Spa (117)" [ref=f88e446] [cursor=pointer]'
+                          - paragraph [ref=f88e449] [cursor=pointer]: Spa (117)
+                      - 'button "See more: Property amenities" [ref=f88e451] [cursor=pointer]': See more
+                  - generic [ref=f88e454]:
+                    - generic [ref=f88e455]:
+                      - heading "Guest rating" [level=3] [ref=f88e456]
+                      - heading "From" [level=3] [ref=f88e457]
+                    - group "Making a selection from this group results in this page refreshing to show relevant results" [ref=f88e458]:
+                      - generic [ref=f88e460]:
+                        - generic [ref=f88e464] [cursor=pointer]:
+                          - radio "Any" [checked] [ref=f88e465]
+                          - generic [ref=f88e466]: Any
+                        - generic [ref=f88e467]: ₹850
+                      - generic [ref=f88e468]:
+                        - generic [ref=f88e472] [cursor=pointer]:
+                          - radio "Wonderful 9+ (159)" [ref=f88e473]
+                          - generic [ref=f88e474]: Wonderful 9+ (159)
+                        - generic [ref=f88e475]: ₹990
+                      - generic [ref=f88e476]:
+                        - generic [ref=f88e480] [cursor=pointer]:
+                          - radio "Very good 8+ (318)" [ref=f88e481]
+                          - generic [ref=f88e482]: Very good 8+ (318)
+                        - generic [ref=f88e483]: ₹990
+                      - generic [ref=f88e484]:
+                        - generic [ref=f88e488] [cursor=pointer]:
+                          - radio "Good 7+ (444)" [ref=f88e489]
+                          - generic [ref=f88e490]: Good 7+ (444)
+                        - generic [ref=f88e491]: ₹990
+                  - group [ref=f88e494]:
+                    - heading "Meal plans available" [level=3] [ref=f88e497]
+                    - generic [ref=f88e500]:
+                      - 'checkbox "Meal plans available: Breakfast included (783)" [ref=f88e501] [cursor=pointer]'
+                      - paragraph [ref=f88e504] [cursor=pointer]: Breakfast included (783)
+                    - generic [ref=f88e507]:
+                      - 'checkbox "Meal plans available: Full board (33)" [ref=f88e508] [cursor=pointer]'
+                      - paragraph [ref=f88e511] [cursor=pointer]: Full board (33)
+                    - generic [ref=f88e514]:
+                      - 'checkbox "Meal plans available: Half board (119)" [ref=f88e515] [cursor=pointer]'
+                      - paragraph [ref=f88e518] [cursor=pointer]: Half board (119)
+                    - generic [ref=f88e521]:
+                      - 'checkbox "Meal plans available: All-inclusive (6)" [ref=f88e522] [cursor=pointer]'
+                      - paragraph [ref=f88e525] [cursor=pointer]: All-inclusive (6)
+                  - group [ref=f88e528]:
+                    - heading "Traveller experience" [level=3] [ref=f88e531]
+                    - generic [ref=f88e532]:
+                      - generic [ref=f88e534]:
+                        - generic [ref=f88e537]:
+                          - 'checkbox "Traveller experience: Luxury (63)" [ref=f88e538] [cursor=pointer]'
+                          - paragraph [ref=f88e541] [cursor=pointer]: Luxury (63)
+                        - generic [ref=f88e544]:
+                          - 'checkbox "Traveller experience: LGBTQ welcoming (33)" [ref=f88e545] [cursor=pointer]'
+                          - paragraph [ref=f88e548] [cursor=pointer]: LGBTQ welcoming (33)
+                        - generic [ref=f88e551]:
+                          - 'checkbox "Traveller experience: Budget (450)" [ref=f88e552] [cursor=pointer]'
+                          - paragraph [ref=f88e555] [cursor=pointer]: Budget (450)
+                        - generic [ref=f88e558]:
+                          - 'checkbox "Traveller experience: Adults only (1)" [ref=f88e559] [cursor=pointer]'
+                          - paragraph [ref=f88e562] [cursor=pointer]: Adults only (1)
+                      - 'button "See more: Traveller experience" [ref=f88e564] [cursor=pointer]': See more
+                  - group [ref=f88e567]:
+                    - heading "Availability" [level=3] [ref=f88e570]
+                    - generic [ref=f88e573]:
+                      - 'checkbox "Availability: Only show available properties" [ref=f88e574] [cursor=pointer]'
+                      - paragraph [ref=f88e577] [cursor=pointer]: Only show available properties
+                  - group [ref=f88e580]:
+                    - heading "Room amenities" [level=3] [ref=f88e583]
+                    - generic [ref=f88e584]:
+                      - generic [ref=f88e586]:
+                        - generic [ref=f88e589]:
+                          - 'checkbox "Room amenities: Wi-Fi (499)" [ref=f88e590] [cursor=pointer]'
+                          - paragraph [ref=f88e593] [cursor=pointer]: Wi-Fi (499)
+                        - generic [ref=f88e596]:
+                          - 'checkbox "Room amenities: Air conditioning (1121)" [ref=f88e597] [cursor=pointer]'
+                          - paragraph [ref=f88e600] [cursor=pointer]: Air conditioning (1121)
+                        - generic [ref=f88e603]:
+                          - 'checkbox "Room amenities: Private bathroom (401)" [ref=f88e604] [cursor=pointer]'
+                          - paragraph [ref=f88e607] [cursor=pointer]: Private bathroom (401)
+                        - generic [ref=f88e610]:
+                          - 'checkbox "Room amenities: Balcony or patio (255)" [ref=f88e611] [cursor=pointer]'
+                          - paragraph [ref=f88e614] [cursor=pointer]: Balcony or patio (255)
+                        - generic [ref=f88e617]:
+                          - 'checkbox "Room amenities: Refrigerator (294)" [ref=f88e618] [cursor=pointer]'
+                          - paragraph [ref=f88e621] [cursor=pointer]: Refrigerator (294)
+                      - 'button "See more: Room amenities" [ref=f88e623] [cursor=pointer]': See more
+                  - group [ref=f88e626]:
+                    - heading "Room views" [level=3] [ref=f88e629]
+                    - generic [ref=f88e630]:
+                      - generic [ref=f88e632]:
+                        - generic [ref=f88e635]:
+                          - 'checkbox "Room views: Mountain view (9)" [ref=f88e636] [cursor=pointer]'
+                          - paragraph [ref=f88e639] [cursor=pointer]: Mountain view (9)
+                        - generic [ref=f88e642]:
+                          - 'checkbox "Room views: Lake view (10)" [ref=f88e643] [cursor=pointer]'
+                          - paragraph [ref=f88e646] [cursor=pointer]: Lake view (10)
+                        - generic [ref=f88e649]:
+                          - 'checkbox "Room views: City view (457)" [ref=f88e650] [cursor=pointer]'
+                          - paragraph [ref=f88e653] [cursor=pointer]: City view (457)
+                      - 'button "See more: Room views" [ref=f88e655] [cursor=pointer]': See more
+                  - group [ref=f88e658]:
+                    - heading "Nearby activities" [level=3] [ref=f88e661]
+                    - generic [ref=f88e662]:
+                      - generic [ref=f88e664]:
+                        - generic [ref=f88e667]:
+                          - 'checkbox "Nearby activities: Museums (27)" [ref=f88e668] [cursor=pointer]'
+                          - paragraph [ref=f88e671] [cursor=pointer]: Museums (27)
+                        - generic [ref=f88e674]:
+                          - 'checkbox "Nearby activities: Golfing (27)" [ref=f88e675] [cursor=pointer]'
+                          - paragraph [ref=f88e678] [cursor=pointer]: Golfing (27)
+                        - generic [ref=f88e681]:
+                          - 'checkbox "Nearby activities: Rock or mountain climbing (8)" [ref=f88e682] [cursor=pointer]'
+                          - paragraph [ref=f88e685] [cursor=pointer]: Rock or mountain climbing (8)
+                      - 'button "See more: Nearby activities" [ref=f88e687] [cursor=pointer]': See more
+                  - group [ref=f88e690]:
+                    - heading "Accessibility" [level=3] [ref=f88e693]
+                    - generic [ref=f88e694]:
+                      - generic [ref=f88e696]:
+                        - generic [ref=f88e699]:
+                          - 'checkbox "Accessibility: Lift (581)" [ref=f88e700] [cursor=pointer]'
+                          - paragraph [ref=f88e703] [cursor=pointer]: Lift (581)
+                        - generic [ref=f88e706]:
+                          - 'checkbox "Accessibility: Service animals allowed (41)" [ref=f88e707] [cursor=pointer]'
+                          - paragraph [ref=f88e710] [cursor=pointer]: Service animals allowed (41)
+                        - generic [ref=f88e713]:
+                          - 'checkbox "Accessibility: Accessible path of travel (93)" [ref=f88e714] [cursor=pointer]'
+                          - paragraph [ref=f88e717] [cursor=pointer]: Accessible path of travel (93)
+                      - 'button "See more: Accessibility" [ref=f88e719] [cursor=pointer]': See more
+                  - group [ref=f88e722]:
+                    - heading "One Key benefits and discounts" [level=3] [ref=f88e725]
+                    - generic [ref=f88e728]:
+                      - 'checkbox "One Key benefits and discounts: Discounted properties" [ref=f88e729] [cursor=pointer]'
+                      - generic [ref=f88e731] [cursor=pointer]:
+                        - paragraph [ref=f88e732]: Discounted properties
+                        - paragraph [ref=f88e733]: Major discounts on selected stays
+                    - generic [ref=f88e736]:
+                      - 'checkbox "One Key benefits and discounts: Member Prices" [ref=f88e737] [cursor=pointer]'
+                      - generic [ref=f88e739] [cursor=pointer]:
+                        - paragraph [ref=f88e740]: Member Prices
+                        - paragraph [ref=f88e741]: Sign in for instant savings
+                    - generic [ref=f88e744]:
+                      - 'checkbox "One Key benefits and discounts: VIP Access properties (30)" [ref=f88e745] [cursor=pointer]'
+                      - generic [ref=f88e747] [cursor=pointer]:
+                        - paragraph [ref=f88e748]: VIP Access properties (30)
+                        - paragraph [ref=f88e749]: Top-rated stays with member perks
+                  - group [ref=f88e752]:
+                    - heading "Number of bedrooms" [level=3] [ref=f88e755]
+                    - generic [ref=f88e756]:
+                      - generic [ref=f88e758]:
+                        - generic [ref=f88e761]:
+                          - 'checkbox "Number of bedrooms: Studio (170)" [ref=f88e762] [cursor=pointer]'
+                          - paragraph [ref=f88e765] [cursor=pointer]: Studio (170)
+                        - generic [ref=f88e768]:
+                          - 'checkbox "Number of bedrooms: 1 bedroom (1099)" [ref=f88e769] [cursor=pointer]'
+                          - paragraph [ref=f88e772] [cursor=pointer]: 1 (1099)
+                        - generic [ref=f88e775]:
+                          - 'checkbox "Number of bedrooms: 2 bedrooms (101)" [ref=f88e776] [cursor=pointer]'
+                          - paragraph [ref=f88e779] [cursor=pointer]: 2 (101)
+                      - 'button "See more: Number of bedrooms" [ref=f88e781] [cursor=pointer]': See more
+                  - group [ref=f88e784]:
+                    - heading "Beach access" [level=3] [ref=f88e787]
+                    - generic [ref=f88e789]:
+                      - generic:
+                        - 'checkbox "Beach access: On the beach (0)" [disabled]'
+                        - generic:
+                          - generic:
+                            - paragraph: On the beach (0)
+                            - paragraph: Nothing between you and the sand
+                    - generic [ref=f88e791]:
+                      - generic:
+                        - 'checkbox "Beach access: Near the beach (0)" [disabled]'
+                        - generic:
+                          - generic:
+                            - paragraph: Near the beach (0)
+                            - paragraph: Stays within a 15-minute walk to the beach
+            - generic [ref=f88e792]:
+              - radiogroup "Filter by stay types, 3 options, all stays selected" [ref=f88e796]:
+                - generic [ref=f88e797]:
+                  - generic [ref=f88e798] [cursor=pointer]:
+                    - radio "All stays" [checked]
+                    - generic [aria-hidden] [ref=f88e803]: All stays
+                  - generic [ref=f88e804] [cursor=pointer]:
+                    - radio "Hotels"
+                    - generic [aria-hidden] [ref=f88e810]: Hotels
+                  - generic [ref=f88e811] [cursor=pointer]:
+                    - radio "Homes"
+                    - generic [aria-hidden] [ref=f88e815]: Homes
+              - generic [ref=f88e818]:
+                - generic [ref=f88e821]:
+                  - generic [ref=f88e822]: 300+ properties
+                  - link "More information on how our sort order works. Opens in a new window." [ref=f88e826] [cursor=pointer]:
+                    - /url: https://www.expedia.co.in/lp/b/sort-order-info
+                    - generic [ref=f88e827]: How our sort order works
+                - button "Sort by recommended for you" [ref=f88e836] [cursor=pointer]
+              - generic [ref=f88e840]:
+                - heading "Search results" [level=2] [ref=f88e841]
+                - generic [ref=f88e843]:
+                  - generic [ref=f88e844]:
+                    - generic [ref=f88e848]:
+                      - generic [ref=f88e849]:
+                        - generic [ref=f88e850]:
+                          - figure [ref=f88e851]:
+                            - generic [ref=f88e852]:
+                              - heading "Photo gallery for Hyatt Centric MG Road Bangalore" [level=3] [ref=f88e853]
+                              - generic [ref=f88e854]:
+                                - figure [ref=f88e856]
+                                - generic [ref=f88e859]:
+                                  - figure [ref=f88e860]:
+                                    - img "An interior space with a brick wall, wooden ceiling, and a dining area with tables and chairs." [ref=f88e862]
+                                  - button [aria-hidden] [ref=f88e863] [cursor=pointer]:
+                                    - generic [ref=f88e864]: An interior space with a brick wall, wooden ceiling, and a dining area with tables and chairs.
+                                - figure [ref=f88e866]
+                              - generic:
+                                - button [ref=f88e869] [cursor=pointer]:
+                                  - img "Show previous image for Hyatt Centric MG Road Bangalore" [ref=f88e870]
+                                - button [ref=f88e872] [cursor=pointer]:
+                                  - img "Show next image for Hyatt Centric MG Road Bangalore" [ref=f88e873]
+                          - link "Sign in to save Hyatt Centric MG Road Bangalore to a trip" [ref=f88e878] [cursor=pointer]
+                          - generic: Ad
+                        - generic [ref=f88e887]:
+                          - generic [ref=f88e890]:
+                            - heading "Hyatt Centric MG Road Bangalore" [level=3] [ref=f88e893]
+                            - generic [ref=f88e894]: Bengaluru
+                            - list [ref=f88e895]:
+                              - listitem [ref=f88e896]:
+                                - generic [ref=f88e897]: Pool
+                          - generic [ref=f88e902]:
+                            - generic [ref=f88e904]:
+                              - generic [ref=f88e906]:
+                                - generic [ref=f88e910]:
+                                  - generic [ref=f88e911]: Heart of Bangalore, Stay Centric
+                                  - generic [ref=f88e913]: Stay productive with free WiFi, work-friendly rooms, a gym and pool, plus easy access to tech parks and metro links to BIEC.
+                                - generic [ref=f88e917]:
+                                  - generic [ref=f88e918]: Fully refundable
+                                  - generic [ref=f88e920]: Reserve now, pay later
+                              - generic [ref=f88e922]:
+                                - generic [ref=f88e924]:
+                                  - generic [aria-hidden] [ref=f88e925]: "8.6"
+                                  - generic [ref=f88e926]: 8.6 out of 10
+                                - generic [ref=f88e927]:
+                                  - generic [ref=f88e928]:
+                                    - generic [aria-hidden] [ref=f88e929]: Excellent
+                                    - generic [ref=f88e930]: excellent
+                                  - generic [ref=f88e931]:
+                                    - generic [aria-hidden] [ref=f88e932]: 414 reviews
+                                    - generic [ref=f88e933]: (414 reviews)
+                            - generic [ref=f88e937]:
+                              - generic [ref=f88e940]:
+                                - generic [ref=f88e941]: The current price is ₹12,930
+                                - generic [ref=f88e943]: ₹12,930
+                              - generic [ref=f88e944]: ₹30,515 total
+                              - generic [ref=f88e948]: includes taxes & fees
+                      - link "Opens Hyatt Centric MG Road Bangalore in new tab" [ref=f88e952] [cursor=pointer]:
+                        - /url: /Bengaluru-Hotels-Hyatt-Centric-MG-Road-Bangalore.h1531574.Hotel-Information?chkin=2026-10-08&chkout=2026-10-10&x_pwa=1&rfrr=HSR&pwa_ts=1788838577090&referrerUrl=aHR0cHM6Ly93d3cuZXhwZWRpYS5jby5pbi9Ib3RlbC1TZWFyY2g%3D&useRewards=false&rm1=a2&regionId=622&destination=Bengaluru%2C+Karnataka%2C+India&destType=MARKET&neighborhoodId=553248635974587131&latLong=12.971599%2C77.594566&sort=RECOMMENDED&top_dp=12930&top_cur=INR&userIntent=&selectedRoomType=200303636&selectedRatePlan=403904480&categorySearch=any_option&searchId=bf337dce-4477-4e48-93c8-9fc34aabb840&containsVideo=false
+                    - generic [ref=f88e957]:
+                      - generic [ref=f88e958]:
+                        - generic [ref=f88e959]:
+                          - figure [ref=f88e960]:
+                            - generic [ref=f88e961]:
+                              - heading "Photo gallery for Doubletree By Hilton Bengaluru Whitefield" [level=3] [ref=f88e962]
+                              - generic [ref=f88e963]:
+                                - figure [ref=f88e965]
+                                - generic [ref=f88e968]:
+                                  - figure [ref=f88e969]:
+                                    - img "A rooftop infinity pool with lounge chairs and a waterfall feature, surrounded by modern buildings and greenery." [ref=f88e971]
+                                  - button [aria-hidden] [ref=f88e972] [cursor=pointer]:
+                                    - generic [ref=f88e973]: A rooftop infinity pool with lounge chairs and a waterfall feature, surrounded by modern buildings and greenery.
+                                - figure [ref=f88e975]
+                              - generic:
+                                - button [ref=f88e978] [cursor=pointer]:
+                                  - img "Show previous image for Doubletree By Hilton Bengaluru Whitefield" [ref=f88e979]
+                                - button [ref=f88e981] [cursor=pointer]:
+                                  - img "Show next image for Doubletree By Hilton Bengaluru Whitefield" [ref=f88e982]
+                          - link "Sign in to save Doubletree By Hilton Bengaluru Whitefield to a trip" [ref=f88e987] [cursor=pointer]
+                          - generic: Ad
+                        - generic [ref=f88e996]:
+                          - generic [ref=f88e999]:
+                            - heading "Doubletree By Hilton Bengaluru Whitefield" [level=3] [ref=f88e1002]
+                            - generic [ref=f88e1003]: Bengaluru
+                            - list [ref=f88e1004]:
+                              - listitem [ref=f88e1005]:
+                                - generic [ref=f88e1006]: Pool
+                          - generic [ref=f88e1011]:
+                            - generic [ref=f88e1014]:
+                              - generic [ref=f88e1016]:
+                                - generic [aria-hidden] [ref=f88e1017]: "9.2"
+                                - generic [ref=f88e1018]: 9.2 out of 10
+                              - generic [ref=f88e1019]:
+                                - generic [ref=f88e1020]:
+                                  - generic [aria-hidden] [ref=f88e1021]: Wonderful
+                                  - generic [ref=f88e1022]: wonderful
+                                - generic [ref=f88e1023]:
+                                  - generic [aria-hidden] [ref=f88e1024]: 23 reviews
+                                  - generic [ref=f88e1025]: (23 reviews)
+                            - generic [ref=f88e1027]:
+                              - generic [ref=f88e1029]:
+                                - generic [ref=f88e1032]:
+                                  - generic [ref=f88e1033]: The current price is ₹21,709
+                                  - generic [ref=f88e1035]: ₹21,709
+                                - generic [ref=f88e1036]: ₹51,233 total
+                                - generic [ref=f88e1040]: includes taxes & fees
+                              - generic [ref=f88e1044]: We have 7 left at this price
+                      - link "Opens Doubletree By Hilton Bengaluru Whitefield in new tab" [ref=f88e1050] [cursor=pointer]:
+                        - /url: /Bengaluru-Hotels-Doubletree-By-Hilton-Bengaluru-Whitefield.h99268074.Hotel-Information?chkin=2026-10-08&chkout=2026-10-10&x_pwa=1&rfrr=HSR&pwa_ts=1788838577093&referrerUrl=aHR0cHM6Ly93d3cuZXhwZWRpYS5jby5pbi9Ib3RlbC1TZWFyY2g%3D&useRewards=false&rm1=a2&regionId=622&destination=Bengaluru%2C+Karnataka%2C+India&destType=MARKET&neighborhoodId=553248635976383609&latLong=12.971599%2C77.594566&sort=RECOMMENDED&top_dp=21709&top_cur=INR&userIntent=&selectedRoomType=323566156&selectedRatePlan=392227887&categorySearch=any_option&searchId=bf337dce-4477-4e48-93c8-9fc34aabb840&containsVideo=false
+                    - generic [ref=f88e1055]:
+                      - generic [ref=f88e1056]:
+                        - generic [ref=f88e1057]:
+                          - figure [ref=f88e1058]:
+                            - generic [ref=f88e1059]:
+                              - heading "Photo gallery for Holiday Inn Bengaluru Racecourse by IHG" [level=3] [ref=f88e1060]
+                              - generic [ref=f88e1061]:
+                                - figure [ref=f88e1063]
+                                - generic [ref=f88e1066]:
+                                  - figure [ref=f88e1067]:
+                                    - img "A modern bar area with seating, a kitchen in the background, and large windows with blinds." [ref=f88e1069]
+                                  - button [aria-hidden] [ref=f88e1070] [cursor=pointer]:
+                                    - generic [ref=f88e1071]: A modern bar area with seating, a kitchen in the background, and large windows with blinds.
+                                - figure [ref=f88e1073]
+                              - generic:
+                                - button [ref=f88e1076] [cursor=pointer]:
+                                  - img "Show previous image for Holiday Inn Bengaluru Racecourse by IHG" [ref=f88e1077]
+                                - button [ref=f88e1079] [cursor=pointer]:
+                                  - img "Show next image for Holiday Inn Bengaluru Racecourse by IHG" [ref=f88e1080]
+                          - link "Sign in to save Holiday Inn Bengaluru Racecourse by IHG to a trip" [ref=f88e1085] [cursor=pointer]
+                        - generic [ref=f88e1092]:
+                          - generic [ref=f88e1095]:
+                            - heading "Holiday Inn Bengaluru Racecourse by IHG" [level=3] [ref=f88e1098]
+                            - generic [ref=f88e1099]: Bengaluru
+                            - list [ref=f88e1100]:
+                              - listitem [ref=f88e1101]:
+                                - generic [ref=f88e1102]: Pool
+                          - generic [ref=f88e1107]:
+                            - generic [ref=f88e1109]:
+                              - generic [ref=f88e1113]:
+                                - generic [ref=f88e1114]: Fully refundable
+                                - generic [ref=f88e1116]: Reserve now, pay later
+                              - generic [ref=f88e1118]:
+                                - generic [ref=f88e1120]:
+                                  - generic [aria-hidden] [ref=f88e1121]: "8.6"
+                                  - generic [ref=f88e1122]: 8.6 out of 10
+                                - generic [ref=f88e1123]:
+                                  - generic [ref=f88e1124]:
+                                    - generic [aria-hidden] [ref=f88e1125]: Excellent
+                                    - generic [ref=f88e1126]: excellent
+                                  - generic [ref=f88e1127]:
+                                    - generic [aria-hidden] [ref=f88e1128]: 238 reviews
+                                    - generic [ref=f88e1129]: (238 reviews)
+                            - generic [ref=f88e1133]:
+                              - generic [ref=f88e1136]:
+                                - generic [ref=f88e1137]: The current price is ₹8,404
+                                - generic [ref=f88e1139]: ₹8,404
+                              - generic [ref=f88e1140]: ₹21,013 total
+                              - generic [ref=f88e1144]: includes taxes & fees
+                      - link "More information about Holiday Inn Bengaluru Racecourse by IHG, opens in a new tab" [ref=f88e1148] [cursor=pointer]:
+                        - /url: /Bengaluru-Hotels-Holiday-Inn-Bengaluru-Racecourse.h19413821.Hotel-Information?chkin=2026-10-08&chkout=2026-10-10&x_pwa=1&rfrr=HSR&pwa_ts=1788838577096&referrerUrl=aHR0cHM6Ly93d3cuZXhwZWRpYS5jby5pbi9Ib3RlbC1TZWFyY2g%3D&useRewards=false&rm1=a2&regionId=622&destination=Bengaluru%2C+Karnataka%2C+India&destType=MARKET&neighborhoodId=6126931&latLong=12.971599%2C77.594566&sort=RECOMMENDED&top_dp=8404&top_cur=INR&userIntent=&selectedRoomType=202152480&selectedRatePlan=381148858&categorySearch=any_option&searchId=bf337dce-4477-4e48-93c8-9fc34aabb840&containsVideo=false
+                    - figure [ref=f88e1152]
+                    - figure [ref=f88e1157]
+                    - figure [ref=f88e1162]
+                    - figure [ref=f88e1167]
+                    - figure [ref=f88e1172]
+                    - figure [ref=f88e1177]
+                    - figure [ref=f88e1182]
+                    - figure [ref=f88e1187]
+                    - figure [ref=f88e1192]
+                    - figure [ref=f88e1197]
+                    - figure [ref=f88e1202]
+                    - figure [ref=f88e1207]
+                    - figure [ref=f88e1212]
+                    - figure [ref=f88e1217]
+                    - figure [ref=f88e1222]
+                    - figure [ref=f88e1227]
+                    - figure [ref=f88e1232]
+                    - figure [ref=f88e1237]
+                    - figure [ref=f88e1242]
+                    - figure [ref=f88e1247]
+                  - generic [ref=f88e1250]:
+                    - generic "Loading" [ref=f88e1252]
+                    - button "Show more stays" [disabled] [ref=f88e1255]: Show more
+              - button "Footer"
+              - generic [ref=f88e1256]:
+                - generic [ref=f88e1257]:
+                  - generic:
+                    - generic:
+                      - document
+                  - generic:
+                    - generic:
+                      - document:
+                        - document
+                - generic [ref=f88e1259]:
+                  - generic [ref=f88e1260]: Tell us how we can improve our site
+                  - link "Share feedback. This link will open in a new tab" [ref=f88e1261] [cursor=pointer]:
+                    - /url: https://www.directword.io/survey/domain=www.expedia.co.in/locale=en_GB?QTM_SID=571a99ab9448486abd09ca117132ee2e&QTM_UID=4a3e225b7d9947e9c6d8e496422d9ef8&metadata=%7B%22duaid%22%3A%22cea4ce20-b078-4907-9175-202f4cdb4464%22%2C%22tuid%22%3A%22-1%22%2C%22eid%22%3A%22-1%22%2C%22page_name%22%3A%22page.Hotel-Search%22%2C%22url%22%3A%22https%3A%2F%2Fwww.expedia.co.in%2FHotel-Search%3Fdestination%3DBengaluru%252C%2520Karnataka%252C%2520India%26d1%3D2026-10-08%26startDate%3D2026-10-08%26d2%3D2026-10-10%26endDate%3D2026-10-10%26adults%3D2%26rooms%3D1%26sort%3DRECOMMENDED%26regionId%3D622%26theme%3D%26userIntent%3D%26semdtl%3D%26categorySearch%3D%26useRewards%3Dfalse%22%7D
+                    - text: Share feedback
+    - generic [ref=f88e1266]: Loading
+  - generic [ref=f88e1267]: 495 Properties in Bengaluru, Karnataka, India. 8 October 2026 through 10 October 2026

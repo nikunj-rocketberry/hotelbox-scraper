@@ -1,0 +1,252 @@
+- generic [ref=f47e5]:
+  - banner [ref=f47e7]:
+    - generic [ref=f47e11]:
+      - link [ref=f47e12] [cursor=pointer]:
+        - /url: https://www.expedia.co.in/
+        - img "Expedia logo" [ref=f47e13]
+      - button [ref=f47e18] [cursor=pointer]:
+        - generic [aria-hidden] [ref=f47e19]: Shop travel
+        - img "Shop travel" [ref=f47e20]
+      - list [ref=f47e22]:
+        - listitem [ref=f47e23]:
+          - link "Open app" [ref=f47e25] [cursor=pointer]:
+            - /url: https://expe.onelink.me/hnLd?pid=BRAND&af_adset=EXPEDIA-IN&c=MAD-NAVBAR-NAVPILL&af_ad=DIRECT.WEB_NULL_REFERRAL&af_web_dp=https%3A%2F%2Fwww.expedia.co.in%2Fapp&af_siteid=27&af_sub_siteid=page.Hotels.Infosite.Information&custom_web_attribute=cea4ce20-b078-4907-9175-202f4cdb4464&af_sub1=cea4ce20-b078-4907-9175-202f4cdb4464&m_dev_type=DESKTOP&m_user_state=ANON&deep_link_value=https%3A%2F%2Fwww.expedia.co.in%2FBengaluru-Hotels-Hyatt-Centric-MG-Road-Bangalore.h1531574.Hotel-Information%3Fchkin%3D2026-10-08%26chkout%3D2026-10-10
+        - listitem [ref=f47e31]:
+          - button "INR India" [ref=f47e32] [cursor=pointer]:
+            - generic [ref=f47e33]: INR
+            - generic [aria-hidden] [ref=f47e35]: •
+            - img "India" [ref=f47e36]
+        - listitem [ref=f47e37]:
+          - link "List your property" [ref=f47e38] [cursor=pointer]:
+            - /url: https://apps.expediapartnercentral.com/en_GB/list?utm_medium=referral&utm_source=wwwexpediacoin-en_GB&utm_campaign=Brand.DTI&utm_contentewd=pwa-header-btn&siteId=27&tpid=27&eapid=0&langId=2057&utm_term=Brand.DTI&lasttouchMktgcode=Brand.DTI
+        - listitem [ref=f47e39]:
+          - link "Support" [ref=f47e40] [cursor=pointer]:
+            - /url: /helpcenter/
+        - listitem [ref=f47e41]:
+          - link "Trips" [ref=f47e42] [cursor=pointer]:
+            - /url: /trips
+        - listitem [ref=f47e43]:
+          - link [ref=f47e45] [cursor=pointer]:
+            - /url: /inbox/notifications
+            - img "Communication Center" [ref=f47e47]
+        - listitem [ref=f47e50]:
+          - button "Sign in" [ref=f47e54] [cursor=pointer]
+  - main [ref=f47e56]:
+    - generic [ref=f47e59]:
+      - generic [ref=f47e64]:
+        - generic [ref=f47e73]:
+          - generic [ref=f47e80]:
+            - generic: Where to?
+            - textbox "Where to?" [ref=f47e81]
+          - generic [ref=f47e87]:
+            - generic: Dates
+            - button "Dates, Thu 8 Oct - Sat 10 Oct" [ref=f47e88] [cursor=pointer]: Thu 8 Oct - Sat 10 Oct
+          - generic [ref=f47e92]:
+            - generic: Travellers
+            - button "Travellers, 2 travellers, 1 room" [ref=f47e93] [cursor=pointer]: 2 travellers, 1 room
+          - button "Search" [ref=f47e95] [cursor=pointer]
+        - generic [ref=f47e96]:
+          - generic [ref=f47e105]:
+            - generic [ref=f47e107]:
+              - heading "Photo gallery for Hyatt Centric MG Road Bangalore" [level=2] [ref=f47e108]
+              - figure [ref=f47e109]:
+                - generic:
+                  - img "An interior space with a brick wall, wooden ceiling, and a dining area with tables and chairs." [ref=f47e111]
+                  - button "Restaurant" [ref=f47e112] [cursor=pointer]
+              - figure [ref=f47e115]:
+                - generic:
+                  - img "A modern interior with a reception desk, seating area with tables and chairs, and a bookshelf with various items." [ref=f47e117]
+                  - button "Lobby" [ref=f47e118] [cursor=pointer]
+              - figure [ref=f47e121]:
+                - generic:
+                  - img "A person relaxing on a lounge chair with a table of food and drinks in front of them, overlooking a lush landscape." [ref=f47e123]
+                  - button "Room" [ref=f47e124] [cursor=pointer]
+              - figure [ref=f47e127]:
+                - generic:
+                  - img "A modern lounge area with a leather sofa, blue chairs, and a coffee table. There are shelves with decorative items and plants." [ref=f47e129]
+                  - button "Restaurant" [ref=f47e130] [cursor=pointer]
+              - figure [ref=f47e133]:
+                - generic:
+                  - img "A swimming pool with tiled flooring, surrounded by lounge chairs and potted plants." [ref=f47e135]
+                  - button "Pool" [ref=f47e136] [cursor=pointer]
+            - button "Show all 87 images" [ref=f47e141] [cursor=pointer]: 87+
+          - list [ref=f47e154]:
+            - listitem [ref=f47e155] [cursor=pointer]:
+              - link "Overview" [ref=f47e156]:
+                - /url: "#Overview"
+            - listitem [ref=f47e158] [cursor=pointer]:
+              - link "About" [ref=f47e159]:
+                - /url: "#About"
+            - listitem [ref=f47e161] [cursor=pointer]:
+              - link "Rooms" [ref=f47e162]:
+                - /url: "#Offers"
+            - listitem [ref=f47e164] [cursor=pointer]:
+              - link "Policies" [ref=f47e165]:
+                - /url: "#Policies"
+            - listitem [ref=f47e167] [cursor=pointer]:
+              - link "Accessibility" [ref=f47e168]:
+                - /url: "#Accessibility"
+            - listitem [aria-hidden] [ref=f47e170]
+        - generic [ref=f47e174]:
+          - generic [ref=f47e177]:
+            - generic [ref=f47e178]:
+              - generic [ref=f47e181]:
+                - generic [ref=f47e183]:
+                  - generic [ref=f47e184]:
+                    - generic [ref=f47e185]: Luxury
+                    - generic [ref=f47e188]:
+                      - generic [ref=f47e189]: "Property class: 5 and above"
+                      - button "More information about this property class rating" [ref=f47e201] [cursor=pointer]
+                  - heading "Hyatt Centric MG Road Bangalore" [level=1] [ref=f47e206]
+                - generic [ref=f47e209]:
+                  - heading "Reviews" [level=2] [ref=f47e210]
+                  - generic [ref=f47e211]:
+                    - generic [ref=f47e212]:
+                      - generic [ref=f47e213]:
+                        - generic [aria-hidden] [ref=f47e214]: "8.6"
+                        - generic [ref=f47e215]: 8.6 out of 10
+                      - generic [ref=f47e216]: Excellent
+                    - button "See all 414 reviews" [ref=f47e218] [cursor=pointer]: 414 reviews
+                - generic [ref=f47e222]:
+                  - heading "Luxury hotel near M.G. Road" [level=3] [ref=f47e224]
+                  - paragraph [ref=f47e228]: At Hyatt Centric MG Road Bangalore, you can look forward to a poolside bar, a terrace and a shopping centre on-site. Treat yourself to a massage at the on-site spa. The on-site restaurant, The Bengaluru Brasserie, offers breakfast, lunch, dinner, light fare and al fresco dining. Free in-room WiFi is available to all guests, along with a coffee shop/cafe and a garden.
+              - generic [ref=f47e230]:
+                - heading "Highlights for your 2-night trip" [level=2] [ref=f47e231]
+                - list [ref=f47e233]:
+                  - listitem [ref=f47e234]:
+                    - generic [ref=f47e241]:
+                      - generic [ref=f47e242]: Loved by couples
+                      - generic [ref=f47e243]: This property received multiple 10/10 ratings from couples.
+                  - listitem [ref=f47e244]:
+                    - generic [ref=f47e251]:
+                      - generic [ref=f47e252]: Wake up to tasty breakfast
+                      - generic [ref=f47e253]: Guests enjoy the delicious breakfast at this property.
+                  - listitem [ref=f47e254]:
+                    - generic [ref=f47e261]:
+                      - generic [ref=f47e262]: 24 hour airport shuttle available
+                      - generic [ref=f47e263]: A rare find - Convenient and round-the-clock airport shuttle service for easy travel.
+                  - listitem [ref=f47e264]:
+                    - generic [ref=f47e271]:
+                      - generic [ref=f47e272]: Easy to get around
+                      - generic [ref=f47e273]: Guests love the convenient spot for exploring the area.
+              - generic [ref=f47e278]:
+                - generic [ref=f47e280]:
+                  - heading "About this property" [level=2] [ref=f47e282]
+                  - list [ref=f47e287]:
+                    - listitem [ref=f47e288]:
+                      - generic [ref=f47e292]: Outdoor pool
+                    - listitem [ref=f47e294]:
+                      - generic [ref=f47e297]: Breakfast for a fee
+                    - listitem [ref=f47e299]:
+                      - generic [ref=f47e303]: Self-parking included
+                    - listitem [ref=f47e305]:
+                      - generic [ref=f47e308]: 24-hour airport shuttle available
+                    - listitem [ref=f47e310]:
+                      - generic [ref=f47e315]: Restaurant
+                    - listitem [ref=f47e317]:
+                      - generic [ref=f47e320]: Full-service spa
+                - button "See all about this property" [ref=f47e322] [cursor=pointer]
+            - generic [ref=f47e328]:
+              - generic [ref=f47e329]:
+                - heading "Explore the area" [level=2] [ref=f47e332]
+                - generic [ref=f47e333]:
+                  - figure [ref=f47e335]:
+                    - img "View in a map" [ref=f47e337]
+                    - button [aria-hidden] [ref=f47e338] [cursor=pointer]:
+                      - generic [ref=f47e339]: View in a map
+                  - generic [ref=f47e340]:
+                    - generic [ref=f47e341]: 1/1 Swami Vivekananda Road, Ulsoor, Bengaluru, Karnataka, 560008
+                    - button "View in a map" [ref=f47e342] [cursor=pointer]
+              - generic [ref=f47e345]:
+                - list [ref=f47e348]:
+                  - listitem [ref=f47e349]:
+                    - generic [ref=f47e352]:
+                      - generic [aria-hidden] [ref=f47e353]: 1 MG-Lido Mall
+                      - generic [ref=f47e354]: Place, 1 MG-Lido Mall
+                      - generic [ref=f47e355]: ‪2 min walk‬
+                  - listitem [ref=f47e356]:
+                    - generic [ref=f47e359]:
+                      - generic [aria-hidden] [ref=f47e360]: M.G. Road
+                      - generic [ref=f47e361]: Place, M.G. Road
+                      - generic [ref=f47e362]: ‪3 min walk‬
+                  - listitem [ref=f47e363]:
+                    - generic [ref=f47e366]:
+                      - generic [aria-hidden] [ref=f47e367]: Ulsoor Lake
+                      - generic [ref=f47e368]: Place, Ulsoor Lake
+                      - generic [ref=f47e369]: ‪8 min walk‬
+                - button "See all about this area" [ref=f47e371] [cursor=pointer]
+          - generic [ref=f47e382]:
+            - generic [ref=f47e385]:
+              - heading "Change Search" [level=3] [ref=f47e386]
+              - generic [ref=f47e387]:
+                - generic [ref=f47e390]:
+                  - generic [ref=f47e392]:
+                    - generic: Start date
+                    - button "Start date, 8 Oct" [ref=f47e393] [cursor=pointer]: 8 Oct
+                  - generic [ref=f47e395]:
+                    - generic: End date
+                    - button "End date, 10 Oct" [ref=f47e396] [cursor=pointer]: 10 Oct
+                - generic [ref=f47e398]:
+                  - generic: Travellers
+                  - textbox "Travellers" [ref=f47e399]: "2"
+            - generic [ref=f47e401]:
+              - generic [ref=f47e402]:
+                - group "1 out of 4" [ref=f47e403]:
+                  - figure [ref=f47e407]
+                - group "2 out of 4" [ref=f47e409]:
+                  - figure [ref=f47e413]
+                - group [aria-hidden] [ref=f47e415]:
+                  - figure [ref=f47e419]
+                - group [aria-hidden] [ref=f47e421]:
+                  - figure [ref=f47e425]
+              - generic:
+                - button [aria-hidden]
+                - button "next":
+                  - img "next"
+          - figure [ref=f47e436]
+          - generic [ref=f47e439]:
+            - generic [ref=f47e440]:
+              - heading "Accessibility" [level=2] [ref=f47e441]
+              - paragraph [ref=f47e442]: If you have requests for specific accessibility needs, please contact the property using the information on the reservation confirmation received after booking.
+            - generic [ref=f47e443]:
+              - heading "Common areas" [level=3] [ref=f47e449]
+              - list [ref=f47e450]:
+                - listitem [ref=f47e451]:
+                  - generic [ref=f47e452]: Wheelchair accessible (may have limitations)
+                - listitem [ref=f47e453]:
+                  - generic [ref=f47e454]: Lift
+                - listitem [ref=f47e455]:
+                  - generic [ref=f47e456]: Valet for wheelchair-equipped vehicles
+                - listitem [ref=f47e457]:
+                  - generic [ref=f47e458]: Well-lit path to entrance
+                - listitem [ref=f47e459]:
+                  - generic [ref=f47e460]: Wheelchair-accessible business centre
+                - listitem [ref=f47e461]:
+                  - generic [ref=f47e462]: Wheelchair-accessible concierge desk
+                - listitem [ref=f47e463]:
+                  - generic [ref=f47e464]: Wheelchair-accessible gym
+                - listitem [ref=f47e465]:
+                  - generic [ref=f47e466]: Wheelchair-accessible lounge
+                - listitem [ref=f47e467]:
+                  - generic [ref=f47e468]: Wheelchair-accessible parking
+                - listitem [ref=f47e469]:
+                  - generic [ref=f47e470]: Wheelchair-accessible path of travel
+                - listitem [ref=f47e471]:
+                  - generic [ref=f47e472]: Wheelchair-accessible path to lift
+                - listitem [ref=f47e473]:
+                  - generic [ref=f47e474]: Wheelchair-accessible pool
+                - listitem [ref=f47e475]:
+                  - generic [ref=f47e476]: Wheelchair-accessible public bathroom
+                - listitem [ref=f47e477]:
+                  - generic [ref=f47e478]: Wheelchair-accessible registration desk
+                - listitem [ref=f47e479]:
+                  - generic [ref=f47e480]: Wheelchair-accessible restaurant
+                - listitem [ref=f47e481]:
+                  - generic [ref=f47e482]: Wheelchair-accessible spa
+                - listitem [ref=f47e483]:
+                  - generic [ref=f47e484]: Wheelchair-accessible van parking
+      - generic [ref=f47e489]:
+        - generic:
+          - generic:
+            - document
+  - generic [ref=f47e496]: Loading

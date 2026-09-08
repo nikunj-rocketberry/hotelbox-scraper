@@ -135,20 +135,31 @@ export class IngestionService {
 
   private async uploadMediaBatch(media: ScrapedHotel['media'], keyPrefix: string): Promise<UploadedMediaRow[]> {
     const uploaded: UploadedMediaRow[] = [];
-    for (const [index, item] of media.entries()) {
-      try {
-        const { url: mediaUrl, key: s3Key } = await this.storageService.uploadFromUrl(item.url, `${keyPrefix}/${index}`);
-        uploaded.push({
-          mediaUrl,
-          s3Key,
-          sourceUrl: item.url,
-          category: item.category,
-          caption: item.caption,
-          width: item.width,
-          height: item.height,
-        });
-      } catch (err) {
-        this.logger.warn(`Skipping media ${item.url}: ${(err as Error).message}`);
+    const concurrency = 4;
+    for (let i = 0; i < media.length; i += concurrency) {
+      const chunk = media.slice(i, i + concurrency);
+      const results = await Promise.all(
+        chunk.map(async (item, chunkIdx) => {
+          const index = i + chunkIdx;
+          try {
+            const { url: mediaUrl, key: s3Key } = await this.storageService.uploadFromUrl(item.url, `${keyPrefix}/${index}`);
+            return {
+              mediaUrl,
+              s3Key,
+              sourceUrl: item.url,
+              category: item.category,
+              caption: item.caption,
+              width: item.width,
+              height: item.height,
+            };
+          } catch (err) {
+            this.logger.warn(`Skipping media ${item.url}: ${(err as Error).message}`);
+            return null;
+          }
+        }),
+      );
+      for (const res of results) {
+        if (res) uploaded.push(res);
       }
     }
     return uploaded;

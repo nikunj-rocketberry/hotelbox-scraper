@@ -5,6 +5,7 @@ import { DatabaseModule } from './database/database.module';
 import { QueueModule } from './queue/queue.module';
 import { TriggerModule } from './trigger/trigger.module';
 import { CatalogModule } from './catalog/catalog.module';
+import { StorageModule } from './storage/storage.module';
 
 /**
  * API process: enqueues jobs and exposes queue status. Deliberately does NOT
@@ -19,6 +20,7 @@ import { CatalogModule } from './catalog/catalog.module';
     QueueModule,
     TriggerModule,
     CatalogModule,
+    StorageModule,
   ],
 })
 export class AppModule {}

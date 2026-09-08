@@ -1,0 +1,57 @@
+- generic [active] [ref=f58e1]:
+  - generic [ref=f58e2]:
+    - banner [ref=f58e4]:
+      - banner [ref=f58e5]:
+        - generic [ref=f58e8]:
+          - generic [ref=f58e9]:
+            - link [ref=f58e10] [cursor=pointer]:
+              - /url: /
+              - img "www.expedia.co.in" [ref=f58e11]
+            - navigation [ref=f58e12]:
+              - button "More travel" [ref=f58e14] [cursor=pointer]
+          - navigation [ref=f58e19]:
+            - generic [ref=f58e20]:
+              - button "English" [ref=f58e22] [cursor=pointer]
+              - link [ref=f58e29] [cursor=pointer]:
+                - /url: ""
+              - link "Support" [ref=f58e31] [cursor=pointer]:
+                - /url: /service/
+              - link "Trips" [ref=f58e35] [cursor=pointer]:
+                - /url: /trips
+            - generic [ref=f58e39]:
+              - button "Sign in" [ref=f58e40] [cursor=pointer]
+              - text:  
+      - generic:             
+    - generic [ref=f58e44]:
+      - heading "Sorry, it seems we’ve taken a wrong turn." [level=1] [ref=f58e45]: Sorry,it seems we’ve taken a wrong turn.
+      - paragraph [ref=f58e46]: Get your journey back on track with one of the following options.
+      - list [ref=f58e47]:
+        - listitem [ref=f58e48]:
+          - link "Head Home" [ref=f58e49] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=f58e50]:
+          - link "Find travel deals" [ref=f58e51] [cursor=pointer]:
+            - /url: /deals
+        - listitem [ref=f58e52]:
+          - link "Sign in or register" [ref=f58e53] [cursor=pointer]:
+            - /url: /user/signin?ckoflag=0
+  - contentinfo "footer" [ref=f58e55]:
+    - generic [ref=f58e56]:
+      - list [ref=f58e57]:
+        - listitem [ref=f58e58]:
+          - link "Privacy Policy Opens in a new window." [ref=f58e59] [cursor=pointer]:
+            - /url: //www.expedia.co.in/privacy
+            - text: Privacy Policy
+            - generic [aria-hidden] [ref=f58e60]: 
+            - generic [ref=f58e61]: Opens in a new window.
+        - listitem [ref=f58e62]:
+          - link "Terms of Use Opens in a new window." [ref=f58e63] [cursor=pointer]:
+            - /url: //www.expedia.co.in/terms
+            - text: Terms of Use
+            - generic [aria-hidden] [ref=f58e64]: 
+            - generic [ref=f58e65]: Opens in a new window.
+        - listitem [ref=f58e66]: © 2026 Expedia, Inc., an Expedia Group company. All rights reserved. Expedia and the Airplane Logo are trademarks or registered trademarks of Expedia, Inc.
+      - img "Secured Site - Verizon Cybertrust Security" [ref=f58e68]
+      - link [ref=f58e70] [cursor=pointer]:
+        - /url: https://www.expediagroup.com
+        - img "Expedia Group Logo. Opens in a new window." [ref=f58e71]

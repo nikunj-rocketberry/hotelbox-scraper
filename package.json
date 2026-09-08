@@ -22,7 +22,11 @@
     "scrape:regions": "ts-node -r tsconfig-paths/register scripts/trigger-regions.ts",
     "cooldown:reset": "ts-node -r tsconfig-paths/register scripts/reset-cooldown.ts",
     "queue:clear": "ts-node -r tsconfig-paths/register scripts/clear-queues.ts",
-    "cities:clear": "ts-node -r tsconfig-paths/register scripts/clear-cities.ts"
+    "cities:clear": "ts-node -r tsconfig-paths/register scripts/clear-cities.ts",
+    "bucket:public": "ts-node -r tsconfig-paths/register scripts/make-bucket-public.ts",
+    "db:clean": "ts-node -r tsconfig-paths/register scripts/clean-database.ts",
+    "storage:clean": "ts-node -r tsconfig-paths/register scripts/clean-storage.ts",
+    "clean:all": "ts-node -r tsconfig-paths/register scripts/reset-all.ts"
   },
   "dependencies": {
     "@nestjs/bullmq": "^10.2.3",

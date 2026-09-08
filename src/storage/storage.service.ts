@@ -30,6 +30,28 @@ export class StorageService implements OnModuleInit {
       await this.client.makeBucket(this.bucket);
       this.logger.log(`Created MinIO bucket "${this.bucket}"`);
     }
+    await this.ensureBucketPublic();
+  }
+
+  private async ensureBucketPublic(): Promise<void> {
+    const policy = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Sid: 'PublicRead',
+          Effect: 'Allow',
+          Principal: '*',
+          Action: ['s3:GetObject'],
+          Resource: [`arn:aws:s3:::${this.bucket}/*`],
+        },
+      ],
+    };
+    try {
+      await this.client.setBucketPolicy(this.bucket, JSON.stringify(policy));
+      this.logger.log(`Configured MinIO bucket "${this.bucket}" with public-read policy`);
+    } catch (err) {
+      this.logger.warn(`Failed to set public policy on MinIO bucket "${this.bucket}": ${(err as Error).message}`);
+    }
   }
 
   /**

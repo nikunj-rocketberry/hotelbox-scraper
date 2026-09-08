@@ -1,0 +1,390 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - link "Skip to main content" [ref=e9] [cursor=pointer]:
+        - /url: "#main_content"
+      - banner [ref=e11]:
+        - generic [ref=e15]:
+          - link [ref=e16] [cursor=pointer]:
+            - /url: https://www.expedia.co.in/
+            - img "Expedia logo" [ref=e17]
+          - button [ref=e22] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e23]: Shop travel
+            - img "Shop travel" [ref=e24]
+          - list [ref=e26]:
+            - listitem [ref=e27]:
+              - button "INR India" [ref=e28] [cursor=pointer]:
+                - generic [ref=e29]: INR
+                - generic [aria-hidden] [ref=e31]: •
+                - img "India" [ref=e32]
+            - listitem [ref=e33]:
+              - link "List your property" [ref=e34] [cursor=pointer]:
+                - /url: https://apps.expediapartnercentral.com/en_GB/list?utm_medium=referral&utm_source=wwwexpediacoin-en_GB&utm_campaign=Brand.DTI&utm_contentewd=pwa-header-btn&siteId=27&tpid=27&eapid=0&langId=2057&utm_term=Brand.DTI&lasttouchMktgcode=Brand.DTI
+            - listitem [ref=e35]:
+              - link "Support" [ref=e36] [cursor=pointer]:
+                - /url: /helpcenter/
+            - listitem [ref=e37]:
+              - link "Trips" [ref=e38] [cursor=pointer]:
+                - /url: /trips
+            - listitem [ref=e39]:
+              - link [ref=e41] [cursor=pointer]:
+                - /url: /inbox/notifications
+                - img "Communication Center" [ref=e43]
+            - listitem [ref=e46]:
+              - generic [ref=e47]:
+                - button "Sign in" [expanded] [ref=e50] [cursor=pointer]
+                - generic [ref=e52]:
+                  - generic [ref=e53]: Unlock instant savings with Member Prices
+                  - list [ref=e55]:
+                    - listitem [ref=e56]:
+                      - link "Sign in" [ref=e58] [cursor=pointer]:
+                        - /url: /login?lineOfBusiness=UNCLASSIFIED&loginIngressPoint=HEADER_SIGN_IN&pageLocation=ENTRY&uurl=e3id%3Dredr%26rurl%3D%2F
+                    - listitem [ref=e59]:
+                      - link "Learn more about One Key" [ref=e60] [cursor=pointer]:
+                        - /url: /
+                  - separator [ref=e61]
+                  - list [ref=e62]:
+                    - listitem [ref=e63]:
+                      - link "Feedback" [ref=e65] [cursor=pointer]:
+                        - /url: https://www.directword.io/survey/domain=www.expedia.co.in/locale=en-gb
+    - main [ref=e69]:
+      - generic [ref=e70]:
+        - 'heading "Expedia Travel: Search Hotels, Cheap Flights, Car Hire, Things to Do & Holidays" [level=1] [ref=e71]'
+        - region [ref=e76]:
+          - generic [ref=e81]:
+            - generic [ref=e82]: We are experiencing high call volume. Chat with our virtual agent.
+            - list
+        - generic [ref=e85]:
+          - figure [ref=e86]
+          - generic [ref=e96]:
+            - tablist [ref=e98]:
+              - tab "Stays" [selected] [ref=e99] [cursor=pointer]
+              - tab "Flights" [ref=e103] [cursor=pointer]
+              - tab "Cars" [ref=e107] [cursor=pointer]
+              - tab "Packages" [ref=e111] [cursor=pointer]
+              - listitem [aria-hidden] [ref=e115]
+            - generic [ref=e120]:
+              - generic [ref=e127]:
+                - generic: Where to?
+                - textbox "Where to?" [ref=e128]
+              - generic [ref=e134]:
+                - generic: Dates
+                - button "Dates, Wed 9 Sept - Thu 10 Sept" [ref=e135] [cursor=pointer]: Wed 9 Sept - Thu 10 Sept
+              - generic [ref=e139]:
+                - generic: Travellers
+                - button "Travellers, 2 travellers, 1 room" [ref=e140] [cursor=pointer]: 2 travellers, 1 room
+              - generic [ref=e146]:
+                - checkbox "Add a flight to Bundle & Save*" [ref=e147] [cursor=pointer]
+                - paragraph [ref=e150] [cursor=pointer]: Add a flight to Bundle & Save*
+              - button "Search" [ref=e152] [cursor=pointer]
+        - generic [ref=e157]:
+          - generic [ref=e159]:
+            - generic [ref=e160]:
+              - heading "Last-minute weekend deals" [level=4] [ref=e161]
+              - generic [ref=e162]: Minimum 20% off deals for your next weekend getaway!
+            - link "See all deals" [ref=e164] [cursor=pointer]:
+              - /url: https://www.expedia.co.in/clp/XtvM6jr
+          - region "Last-minute weekend deals" [ref=e167]:
+            - generic [ref=e168]:
+              - group "1 out of 9" [ref=e169]:
+                - generic [ref=e171]:
+                  - generic [ref=e172]:
+                    - generic [ref=e175]:
+                      - heading "Gallery Carousel" [level=3] [ref=e176]
+                      - generic [ref=e177]:
+                        - figure [ref=e179]
+                        - figure [ref=e183]:
+                          - img "A covered outdoor seating area with wicker furniture, marble pillars, and a glass partition." [ref=e185]
+                        - figure [ref=e187]
+                      - generic:
+                        - button [ref=e190] [cursor=pointer]:
+                          - img "Show previous image" [ref=e191]
+                        - button [ref=e193] [cursor=pointer]:
+                          - img "Show next image" [ref=e194]
+                    - link "Save Mystical Valley View Resort and Spa, Udaipur to a trip" [ref=e199] [cursor=pointer]
+                  - heading "Mystical Valley View Resort and Spa, Udaipur" [level=6] [ref=e204]
+                  - generic [ref=e205]: Udaipur
+                  - generic [ref=e206]:
+                    - generic [ref=e207]: "8.6"
+                    - generic [ref=e209]: Excellent
+                    - generic [ref=e210]: (4 reviews)
+                  - generic [ref=e211]:
+                    - generic [ref=e212]: Member Price available
+                    - generic [ref=e217]:
+                      - generic [ref=e218]:
+                        - generic [ref=e220]:
+                          - generic [ref=e221]: The price is ₹4,619
+                          - generic [ref=e223]: ₹4,619
+                        - button "Price was ₹6,599, see more information about Standard Rate." [ref=e224] [cursor=pointer]:
+                          - generic [ref=e226]:
+                            - generic [ref=e227]: Price was ₹6,599, see more information about Standard Rate.
+                            - deletion [ref=e230]: ₹6,599
+                      - generic [ref=e231]: per night
+                      - generic [ref=e235]: ₹9,701 total
+                      - generic [ref=e239]: includes taxes & fees
+                  - link "Check deal for Mystical Valley View Resort and Spa, Udaipur" [ref=e243] [cursor=pointer]:
+                    - /url: https://www.expedia.co.in/Udaipur-District-Hotels-Valley-View-Resort-Spa-By-Traavista.h20168805.Hotel-Information?startDate=2026-09-18&endDate=2026-09-20&guestRating=40&adults=2&rooms=1&rm1=a2
+              - group "2 out of 9" [ref=e245]:
+                - generic [ref=e247]:
+                  - generic [ref=e248]:
+                    - generic [ref=e251]:
+                      - heading "Gallery Carousel" [level=3] [ref=e252]
+                      - generic [ref=e253]:
+                        - figure [ref=e255]
+                        - figure [ref=e259]:
+                          - img "A hotel with a modern facade, a visible entrance, and a parked vehicle in front." [ref=e261]
+                        - figure [ref=e263]
+                      - generic:
+                        - button [ref=e266] [cursor=pointer]:
+                          - img "Show previous image" [ref=e267]
+                        - button [ref=e269] [cursor=pointer]:
+                          - img "Show next image" [ref=e270]
+                    - link "Save Hotel Midtown to a trip" [ref=e275] [cursor=pointer]
+                  - heading "Hotel Midtown" [level=6] [ref=e280]
+                  - generic [ref=e281]: Vadodara
+                  - generic [ref=e282]:
+                    - generic [ref=e283]: "9.0"
+                    - generic [ref=e285]: Wonderful
+                    - generic [ref=e286]: (2 reviews)
+                  - generic [ref=e288]:
+                    - generic [ref=e289]: 21% off
+                    - generic [ref=e292]:
+                      - generic [ref=e293]:
+                        - generic [ref=e295]:
+                          - generic [ref=e296]: The price is ₹2,732
+                          - generic [ref=e298]: ₹2,732
+                        - button "Price was ₹3,449, see more information about Standard Rate." [ref=e299] [cursor=pointer]:
+                          - generic [ref=e301]:
+                            - generic [ref=e302]: Price was ₹3,449, see more information about Standard Rate.
+                            - deletion [ref=e305]: ₹3,449
+                      - generic [ref=e306]: per night
+                      - generic [ref=e310]: ₹5,736 total
+                      - generic [ref=e314]: includes taxes & fees
+                  - link "Check deal for Hotel Midtown" [ref=e318] [cursor=pointer]:
+                    - /url: https://www.expedia.co.in/Vadodara-Hotels-Hotel-Midtown.h64661464.Hotel-Information?startDate=2026-09-18&endDate=2026-09-20&guestRating=40&adults=2&rooms=1&rm1=a2
+              - group "3 out of 9" [ref=e320]:
+                - generic [ref=e322]:
+                  - generic [ref=e323]:
+                    - generic [ref=e326]:
+                      - heading "Gallery Carousel" [level=3] [ref=e327]
+                      - generic [ref=e328]:
+                        - figure [ref=e330]
+                        - figure [ref=e334]:
+                          - img "A modern building with a dark roof and large glass windows, surrounded by lush greenery and a circular garden." [ref=e336]
+                        - figure [ref=e338]
+                      - generic:
+                        - button [ref=e341] [cursor=pointer]:
+                          - img "Show previous image" [ref=e342]
+                        - button [ref=e344] [cursor=pointer]:
+                          - img "Show next image" [ref=e345]
+                    - link "Save Osian Valley Resort & Spa Kumbhalgarh to a trip" [ref=e350] [cursor=pointer]
+                  - heading "Osian Valley Resort & Spa Kumbhalgarh" [level=6] [ref=e355]
+                  - generic [ref=e356]: Kumbhalgarh
+                  - generic [ref=e357]:
+                    - generic [ref=e358]: "10"
+                    - generic [ref=e360]: Exceptional
+                    - generic [ref=e361]: (1 review)
+                  - generic [ref=e363]:
+                    - generic [ref=e364]: Member Price available
+                    - generic [ref=e369]:
+                      - generic [ref=e370]:
+                        - generic [ref=e372]:
+                          - generic [ref=e373]: The price is ₹4,950
+                          - generic [ref=e375]: ₹4,950
+                        - button "Price was ₹6,250, see more information about Standard Rate." [ref=e376] [cursor=pointer]:
+                          - generic [ref=e378]:
+                            - generic [ref=e379]: Price was ₹6,250, see more information about Standard Rate.
+                            - deletion [ref=e382]: ₹6,250
+                      - generic [ref=e383]: per night
+                      - generic [ref=e387]: ₹10,400 total
+                      - generic [ref=e391]: includes taxes & fees
+                  - link "Check deal for Osian Valley Resort & Spa Kumbhalgarh" [ref=e395] [cursor=pointer]:
+                    - /url: https://www.expedia.co.in/Kumbhalgarh-Hotels-Osian-Valley-Resort-Spa-Kumbhalgarh.h123548705.Hotel-Information?startDate=2026-09-18&endDate=2026-09-20&guestRating=40&adults=2&rooms=1&rm1=a2
+              - group [aria-hidden] [ref=e397]:
+                - generic [ref=e399]:
+                  - generic [ref=e400]:
+                    - generic [ref=e403]:
+                      - heading [level=3] [ref=e404]: Gallery Carousel
+                      - generic [ref=e405]:
+                        - figure [ref=e407]
+                        - figure [ref=e411]
+                        - figure [ref=e415]
+                      - button [ref=e418] [cursor=pointer]
+                      - button [ref=e421] [cursor=pointer]
+                    - link [ref=e427] [cursor=pointer]
+                  - heading [level=6] [ref=e432]: VITS Daman Devka Beach
+                  - generic [ref=e433]: Daman
+                  - generic [ref=e434]:
+                    - generic [ref=e435]: "8.0"
+                    - generic [ref=e437]: Very good
+                    - generic [ref=e438]: (9 reviews)
+                  - generic [ref=e440]:
+                    - generic [ref=e441]: 22% off
+                    - generic [ref=e444]:
+                      - generic [ref=e445]:
+                        - generic [ref=e447]:
+                          - generic [ref=e448]: The price is ₹8,290
+                          - generic [ref=e450]: ₹8,290
+                        - button [ref=e451] [cursor=pointer]:
+                          - generic [ref=e453]:
+                            - generic [ref=e454]: Price was ₹10,629, see more information about Standard Rate.
+                            - deletion [ref=e457]: ₹10,629
+                      - generic [ref=e458]: per night
+                      - generic [ref=e462]: ₹18,760 total
+                      - generic [ref=e466]: includes taxes & fees
+                  - link [ref=e470] [cursor=pointer]:
+                    - /url: https://www.expedia.co.in/Daman-Hotels-VITS-Daman-Devka-Beach.h91318792.Hotel-Information?startDate=2026-09-18&endDate=2026-09-20&guestRating=40&adults=2&rooms=1&rm1=a2
+                    - generic [ref=e471]: Check deal for VITS Daman Devka Beach
+              - group [aria-hidden] [ref=e472]:
+                - generic [ref=e474]:
+                  - generic [ref=e475]:
+                    - generic [ref=e478]:
+                      - heading [level=3] [ref=e479]: Gallery Carousel
+                      - generic [ref=e480]:
+                        - figure [ref=e482]
+                        - figure [ref=e486]
+                        - figure [ref=e490]
+                      - button [ref=e493] [cursor=pointer]
+                      - button [ref=e496] [cursor=pointer]
+                    - link [ref=e502] [cursor=pointer]
+                  - heading [level=6] [ref=e507]: Ramee International Surat
+                  - generic [ref=e508]: Surat
+                  - generic [ref=e509]:
+                    - generic [ref=e510]: "8.4"
+                    - generic [ref=e512]: Very good
+                    - generic [ref=e513]: (30 reviews)
+                  - generic [ref=e515]:
+                    - generic [ref=e516]: 36% off
+                    - generic [ref=e519]:
+                      - generic [ref=e520]:
+                        - generic [ref=e522]:
+                          - generic [ref=e523]: The price is ₹6,746
+                          - generic [ref=e525]: ₹6,746
+                        - button [ref=e526] [cursor=pointer]:
+                          - generic [ref=e528]:
+                            - generic [ref=e529]: Price was ₹10,499, see more information about Standard Rate.
+                            - deletion [ref=e532]: ₹10,499
+                      - generic [ref=e533]: per night
+                      - generic [ref=e537]: ₹14,174 total
+                      - generic [ref=e541]: includes taxes & fees
+                  - link [ref=e545] [cursor=pointer]:
+                    - /url: https://www.expedia.co.in/Surat-Hotels-Ramee-International-Surat.h90315653.Hotel-Information?startDate=2026-09-18&endDate=2026-09-20&guestRating=40&adults=2&rooms=1&rm1=a2
+                    - generic [ref=e546]: Check deal for Ramee International Surat
+              - group [aria-hidden] [ref=e547]:
+                - generic [ref=e549]:
+                  - generic [ref=e550]:
+                    - figure [ref=e553]
+                    - generic [ref=e556]: VIP Access
+                    - link [ref=e563] [cursor=pointer]
+                  - heading [level=6] [ref=e568]: Siara Styles Amba Suites
+                  - generic [ref=e569]: Gandhinagar
+                  - generic [ref=e570]:
+                    - generic [ref=e571]: "9.8"
+                    - generic [ref=e573]: Exceptional
+                    - generic [ref=e574]: (7 reviews)
+                  - generic [ref=e576]:
+                    - generic [ref=e577]: Member Price available
+                    - generic [ref=e582]:
+                      - generic [ref=e583]:
+                        - generic [ref=e585]:
+                          - generic [ref=e586]: The price is ₹4,049
+                          - generic [ref=e588]: ₹4,049
+                        - button [ref=e589] [cursor=pointer]:
+                          - generic [ref=e591]:
+                            - generic [ref=e592]: Price was ₹5,399, see more information about Standard Rate.
+                            - deletion [ref=e595]: ₹5,399
+                      - generic [ref=e596]: per night
+                      - generic [ref=e600]: ₹8,504 total
+                      - generic [ref=e604]: includes taxes & fees
+                  - link [ref=e608] [cursor=pointer]:
+                    - /url: https://www.expedia.co.in/Gandhinagar-Hotels-Siara-Styles-Amba-Suites.h33336471.Hotel-Information?startDate=2026-09-18&endDate=2026-09-20&guestRating=40&adults=2&rooms=1&rm1=a2
+                    - generic [ref=e609]: Check deal for Siara Styles Amba Suites
+              - group [aria-hidden] [ref=e610]:
+                - generic [ref=e612]:
+                  - generic [ref=e613]:
+                    - figure [ref=e616]
+                    - link [ref=e622] [cursor=pointer]
+                  - heading [level=6] [ref=e627]: Hotel Casa Brij Boutique Near Nakki Lake, Mount Abu
+                  - generic [ref=e628]: Abu Road
+                  - generic [ref=e629]:
+                    - generic [ref=e630]: "10"
+                    - generic [ref=e632]: Exceptional
+                    - generic [ref=e633]: (1 review)
+                  - generic [ref=e634]:
+                    - generic [ref=e635]: Member Price available
+                    - generic [ref=e640]:
+                      - generic [ref=e641]:
+                        - generic [ref=e643]:
+                          - generic [ref=e644]: The price is ₹4,528
+                          - generic [ref=e646]: ₹4,528
+                        - button [ref=e647] [cursor=pointer]:
+                          - generic [ref=e649]:
+                            - generic [ref=e650]: Price was ₹5,880, see more information about Standard Rate.
+                            - deletion [ref=e653]: ₹5,880
+                      - generic [ref=e654]: per night
+                      - generic [ref=e658]: ₹21,305 total
+                      - generic [ref=e662]: includes taxes & fees
+                  - link [ref=e666] [cursor=pointer]:
+                    - /url: https://www.expedia.co.in/Abu-Road-Hotels-Casa-Brij-Boutique.h132105141.Hotel-Information?startDate=2026-09-18&endDate=2026-09-20&guestRating=40&adults=2&rooms=1&rm1=a2
+                    - generic [ref=e667]: Check deal for Hotel Casa Brij Boutique Near Nakki Lake, Mount Abu
+              - group [aria-hidden] [ref=e668]:
+                - generic [ref=e670]:
+                  - generic [ref=e671]:
+                    - figure [ref=e674]
+                    - link [ref=e680] [cursor=pointer]
+                  - heading [level=6] [ref=e685]: Sshubh Hotel Nathdwara
+                  - generic [ref=e686]: Nathdwara
+                  - generic [ref=e687]:
+                    - generic [ref=e688]: "8.4"
+                    - generic [ref=e690]: Very good
+                    - generic [ref=e691]: (6 reviews)
+                  - generic [ref=e693]:
+                    - generic [ref=e694]: Member Price available
+                    - generic [ref=e699]:
+                      - generic [ref=e700]:
+                        - generic [ref=e702]:
+                          - generic [ref=e703]: The price is ₹4,354
+                          - generic [ref=e705]: ₹4,354
+                        - button [ref=e706] [cursor=pointer]:
+                          - generic [ref=e708]:
+                            - generic [ref=e709]: Price was ₹6,699, see more information about Standard Rate.
+                            - deletion [ref=e712]: ₹6,699
+                      - generic [ref=e713]: per night
+                      - generic [ref=e717]: ₹9,144 total
+                      - generic [ref=e721]: includes taxes & fees
+                  - link [ref=e725] [cursor=pointer]:
+                    - /url: https://www.expedia.co.in/Sadri-Hotels-ShriGo-Hotel-Nathdwara.h69732790.Hotel-Information?startDate=2026-09-18&endDate=2026-09-20&guestRating=40&adults=2&rooms=1&rm1=a2
+                    - generic [ref=e726]: Check deal for Sshubh Hotel Nathdwara
+              - group [aria-hidden] [ref=e727]:
+                - generic [ref=e729]:
+                  - generic [ref=e730]:
+                    - figure [ref=e733]
+                    - link [ref=e739] [cursor=pointer]
+                  - heading [level=6] [ref=e744]: Ramee The Srinivas Palace
+                  - generic [ref=e745]: Bhuj
+                  - generic [ref=e746]:
+                    - generic [ref=e747]: "8.0"
+                    - generic [ref=e749]: Very good
+                    - generic [ref=e750]: (14 reviews)
+                  - generic [ref=e752]:
+                    - generic [ref=e753]: 20% off
+                    - generic [ref=e756]:
+                      - generic [ref=e757]:
+                        - generic [ref=e759]:
+                          - generic [ref=e760]: The price is ₹2,700
+                          - generic [ref=e762]: ₹2,700
+                        - button [ref=e763] [cursor=pointer]:
+                          - generic [ref=e765]:
+                            - generic [ref=e766]: Price was ₹3,375, see more information about Standard Rate.
+                            - deletion [ref=e769]: ₹3,375
+                      - generic [ref=e770]: per night
+                      - generic [ref=e774]: ₹5,670 total
+                      - generic [ref=e778]: includes taxes & fees
+                  - link [ref=e782] [cursor=pointer]:
+                    - /url: https://www.expedia.co.in/Bhuj-Hotels-Ramee-The-Srinivas-Palace.h105075409.Hotel-Information?startDate=2026-09-18&endDate=2026-09-20&guestRating=40&adults=2&rooms=1&rm1=a2
+                    - generic [ref=e783]: Check deal for Ramee The Srinivas Palace
+            - generic:
+              - button [aria-hidden]
+              - button "Next card" [ref=e784] [cursor=pointer]:
+                - img "Next card" [ref=e785]
+  - generic [ref=e788]: Now showing Gallery Carousel, Mystical Valley View Resort and Spa, Udaipur, Gallery Carousel, Hotel Midtown, Gallery Carousel, Osian Valley Resort & Spa Kumbhalgarh

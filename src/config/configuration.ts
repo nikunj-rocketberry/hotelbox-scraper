@@ -35,6 +35,9 @@ export interface AppConfig {
       ratePerHour: number;
       burstCapacity: number;
     };
+    userDataDir?: string;
+    maxHotelMediaCount: number;
+    maxRoomMediaCount: number;
   };
   worker: {
     concurrency: number;
@@ -95,6 +98,9 @@ export default (): AppConfig => ({
       ratePerHour: num(process.env.TRAFFIC_SHAPER_RATE_PER_HOUR, 1000),
       burstCapacity: num(process.env.TRAFFIC_SHAPER_BURST_CAPACITY, 5),
     },
+    userDataDir: process.env.BROWSER_USER_DATA_DIR || undefined,
+    maxHotelMediaCount: num(process.env.HOTEL_MAX_MEDIA_COUNT, 10),
+    maxRoomMediaCount: num(process.env.ROOM_MAX_MEDIA_COUNT, 3),
   },
   worker: {
     concurrency: num(process.env.WORKER_CONCURRENCY, 5),

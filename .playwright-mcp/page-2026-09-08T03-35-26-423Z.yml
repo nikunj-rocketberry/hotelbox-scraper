@@ -1,0 +1,180 @@
+- generic [ref=f77e5]:
+  - banner [ref=f77e7]:
+    - generic [ref=f77e11]:
+      - link [ref=f77e12] [cursor=pointer]:
+        - /url: https://www.expedia.co.in/
+        - img "Expedia logo" [ref=f77e13]
+      - button [ref=f77e18] [cursor=pointer]:
+        - generic [aria-hidden] [ref=f77e19]: Shop travel
+        - img "Shop travel" [ref=f77e20]
+      - list [ref=f77e22]:
+        - listitem [ref=f77e23]:
+          - link "Open app" [ref=f77e25] [cursor=pointer]:
+            - /url: https://expe.onelink.me/hnLd?pid=BRAND&af_adset=EXPEDIA-IN&c=MAD-NAVBAR-NAVPILL&af_ad=DIRECT.WEB_NULL_REFERRAL&af_web_dp=https%3A%2F%2Fwww.expedia.co.in%2Fapp&af_siteid=27&af_sub_siteid=page.Hotels.Infosite.Information&custom_web_attribute=cea4ce20-b078-4907-9175-202f4cdb4464&af_sub1=cea4ce20-b078-4907-9175-202f4cdb4464&m_dev_type=DESKTOP&m_user_state=ANON&deep_link_value=https%3A%2F%2Fwww.expedia.co.in%2FBengaluru-Hotels-Holiday-Inn-Bengaluru-Racecourse.h19413821.Hotel-Information%3Fchkin%3D2026-10-08%26chkout%3D2026-10-10
+        - listitem [ref=f77e31]:
+          - button "INR India" [ref=f77e32] [cursor=pointer]:
+            - generic [ref=f77e33]: INR
+            - generic [aria-hidden] [ref=f77e35]: •
+            - img "India" [ref=f77e36]
+        - listitem [ref=f77e37]:
+          - link "List your property" [ref=f77e38] [cursor=pointer]:
+            - /url: https://apps.expediapartnercentral.com/en_GB/list?utm_medium=referral&utm_source=wwwexpediacoin-en_GB&utm_campaign=Brand.DTI&utm_contentewd=pwa-header-btn&siteId=27&tpid=27&eapid=0&langId=2057&utm_term=Brand.DTI&lasttouchMktgcode=Brand.DTI
+        - listitem [ref=f77e39]:
+          - link "Support" [ref=f77e40] [cursor=pointer]:
+            - /url: /helpcenter/
+        - listitem [ref=f77e41]:
+          - link "Trips" [ref=f77e42] [cursor=pointer]:
+            - /url: /trips
+        - listitem [ref=f77e43]:
+          - link [ref=f77e45] [cursor=pointer]:
+            - /url: /inbox/notifications
+            - img "Communication Center" [ref=f77e47]
+        - listitem [ref=f77e50]:
+          - button "Sign in" [ref=f77e54] [cursor=pointer]
+  - main [ref=f77e56]:
+    - generic [ref=f77e59]:
+      - generic [ref=f77e64]:
+        - generic [ref=f77e79]:
+          - generic [ref=f77e84]:
+            - generic [ref=f77e86]:
+              - heading "Photo gallery for Holiday Inn Bengaluru Racecourse by IHG" [level=2] [ref=f77e87]
+              - figure [ref=f77e88]:
+                - generic:
+                  - img "A modern bar area with seating, a kitchen in the background, and large windows with blinds." [ref=f77e90]
+                  - button "Restaurant" [ref=f77e91] [cursor=pointer]
+              - figure [ref=f77e94]:
+                - generic:
+                  - img "A rooftop pool with blue lounge chairs, a lifebuoy, and a view of a cityscape with buildings and greenery." [ref=f77e96]
+                  - button "Pool" [ref=f77e97] [cursor=pointer]
+              - figure [ref=f77e100]:
+                - generic:
+                  - img "A modern hotel lobby with a reception desk, seating area, and a TV mounted on the wall." [ref=f77e102]
+                  - button "Exterior" [ref=f77e103] [cursor=pointer]
+              - figure [ref=f77e106]:
+                - generic:
+                  - img "A dining area with tables set for breakfast, large windows offering a city view, and a sign indicating the location as Holiday Inn Bengaluru Airport." [ref=f77e108]
+                  - button "Restaurant" [ref=f77e109] [cursor=pointer]
+              - figure [ref=f77e112]:
+                - generic:
+                  - img "A high-rise building with a terrace featuring wicker furniture and a city view." [ref=f77e114]
+                  - button "Standard Room | Terrace/patio" [ref=f77e115] [cursor=pointer]
+            - button "Show all 81 images" [ref=f77e120] [cursor=pointer]: 81+
+          - list [ref=f77e130]:
+            - listitem [ref=f77e131] [cursor=pointer]:
+              - link "Overview" [ref=f77e132]:
+                - /url: "#Overview"
+            - listitem [ref=f77e134] [cursor=pointer]:
+              - link "About" [ref=f77e135]:
+                - /url: "#About"
+            - listitem [ref=f77e137] [cursor=pointer]:
+              - link "Rooms" [ref=f77e138]:
+                - /url: "#Offers"
+            - listitem [ref=f77e140] [cursor=pointer]:
+              - link "Policies" [ref=f77e141]:
+                - /url: "#Policies"
+            - listitem [ref=f77e143] [cursor=pointer]:
+              - link "Accessibility" [ref=f77e144]:
+                - /url: "#Accessibility"
+            - listitem [aria-hidden] [ref=f77e146]
+        - generic [ref=f77e150]:
+          - generic [ref=f77e153]:
+            - generic [ref=f77e155]:
+              - generic [ref=f77e157]:
+                - heading "Holiday Inn Bengaluru Racecourse by IHG" [level=1] [ref=f77e158]
+                - generic [ref=f77e159]:
+                  - generic [ref=f77e160]: "Property class: 3.5"
+                  - button "More information about this property class rating" [ref=f77e170] [cursor=pointer]
+              - generic [ref=f77e178]:
+                - heading "Reviews" [level=2] [ref=f77e179]
+                - generic [ref=f77e180]:
+                  - generic [ref=f77e181]:
+                    - generic [aria-hidden] [ref=f77e182]: "8.6"
+                    - generic [ref=f77e183]: 8.6 out of 10
+                  - generic [ref=f77e184]: Excellent
+                - button "See all 238 reviews" [ref=f77e185] [cursor=pointer]
+              - figure [ref=f77e192]
+              - generic [ref=f77e197]:
+                - generic [ref=f77e199]:
+                  - heading "About this property" [level=2] [ref=f77e201]
+                  - list [ref=f77e206]:
+                    - listitem [ref=f77e207]:
+                      - generic [ref=f77e211]: Outdoor pool
+                    - listitem [ref=f77e213]:
+                      - generic [ref=f77e216]: Breakfast for a fee
+                    - listitem [ref=f77e218]:
+                      - generic [ref=f77e222]: Self-parking included
+                    - listitem [ref=f77e224]:
+                      - generic [ref=f77e227]: 24-hour airport shuttle available
+                    - listitem [ref=f77e229]:
+                      - generic [ref=f77e234]: Buffet restaurant
+                    - listitem [ref=f77e236]:
+                      - generic [ref=f77e239]: Full-service spa
+                - button "See all about this property" [ref=f77e241] [cursor=pointer]
+            - generic [ref=f77e247]:
+              - generic [ref=f77e248]:
+                - heading "Explore the area" [level=2] [ref=f77e251]
+                - generic [ref=f77e252]:
+                  - figure [ref=f77e254]:
+                    - img "View in a map" [ref=f77e256]
+                    - button [aria-hidden] [ref=f77e257] [cursor=pointer]:
+                      - generic [ref=f77e258]: View in a map
+                  - generic [ref=f77e259]:
+                    - generic [ref=f77e260]: "#16/1, Sheshadri Road, Gandhinagar, Ward No. 94, Bengaluru, 560009"
+                    - button "View in a map" [ref=f77e261] [cursor=pointer]
+              - generic [ref=f77e264]:
+                - list [ref=f77e267]:
+                  - listitem [ref=f77e268]:
+                    - generic [ref=f77e271]:
+                      - generic [aria-hidden] [ref=f77e272]: Freedom Park
+                      - generic [ref=f77e273]: Place, Freedom Park
+                      - generic [ref=f77e274]: ‪5 min walk‬
+                  - listitem [ref=f77e275]:
+                    - generic [ref=f77e278]:
+                      - generic [aria-hidden] [ref=f77e279]: Bangalore Turf Club
+                      - generic [ref=f77e280]: Place, Bangalore Turf Club
+                      - generic [ref=f77e281]: ‪10 min walk‬
+                  - listitem [ref=f77e282]:
+                    - generic [ref=f77e285]:
+                      - generic [aria-hidden] [ref=f77e286]: Cubbon Park
+                      - generic [ref=f77e287]: Place, Cubbon Park
+                      - generic [ref=f77e288]: ‪17 min walk‬
+                  - listitem [ref=f77e289]:
+                    - generic [ref=f77e292]:
+                      - generic [aria-hidden] [ref=f77e293]: Bengaluru (BLR-Kempegowda Intl.)
+                      - generic [ref=f77e294]: Airport, Bengaluru (BLR-Kempegowda Intl.)
+                      - generic [ref=f77e295]: ‪59 min drive‬
+                - button "See all about this area" [ref=f77e297] [cursor=pointer]
+          - generic [ref=f77e308]:
+            - generic [ref=f77e311]:
+              - heading "Change Search" [level=3] [ref=f77e312]
+              - generic [ref=f77e313]:
+                - generic [ref=f77e316]:
+                  - generic [ref=f77e318]:
+                    - generic: Start date
+                    - button "Start date, 8 Oct" [ref=f77e319] [cursor=pointer]: 8 Oct
+                  - generic [ref=f77e321]:
+                    - generic: End date
+                    - button "End date, 10 Oct" [ref=f77e322] [cursor=pointer]: 10 Oct
+                - generic [ref=f77e324]:
+                  - generic: Travellers
+                  - textbox "Travellers" [ref=f77e325]: "2"
+            - generic [ref=f77e327]:
+              - generic [ref=f77e328]:
+                - group "1 out of 4" [ref=f77e329]:
+                  - figure [ref=f77e333]
+                - group "2 out of 4" [ref=f77e335]:
+                  - figure [ref=f77e339]
+                - group [aria-hidden] [ref=f77e341]:
+                  - figure [ref=f77e345]
+                - group [aria-hidden] [ref=f77e347]:
+                  - figure [ref=f77e351]
+              - generic:
+                - button [aria-hidden]
+                - button "next":
+                  - img "next"
+          - figure [ref=f77e362]
+      - generic [ref=f77e367]:
+        - generic:
+          - generic:
+            - document
+  - generic [ref=f77e374]: Loading

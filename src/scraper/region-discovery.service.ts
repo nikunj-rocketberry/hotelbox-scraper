@@ -90,7 +90,13 @@ export class RegionDiscoveryService {
     try {
       await this.browser.safeGoto(page, url);
 
-      // Strategy 1: "Destinations in <State>" section (present on Gujarat, Rajasthan)
+      // Strategy 1: "Destinations in <State>" section. Confirmed live (2026-09-08)
+      // to be present on some states and entirely absent on others (Karnataka),
+      // and that presence isn't predictable up front — so this always attempts
+      // it, and Strategy 3 below always ALSO runs rather than being gated on
+      // "strategy 1 found nothing": both are cheap, independent signals, and a
+      // state where the destinations module exists but is sparse still
+      // benefits from the union rather than stopping at whichever ran first.
       const section = await page
         .waitForSelector(ExpediaSelectors.search.destinationsSection, { timeout: 8_000 })
         .catch(() => null);
@@ -116,55 +122,77 @@ export class RegionDiscoveryService {
             }
           }
         }
+        this.logger.log(`Destinations section yielded ${names.size} valid cities so far.`);
+      } else {
+        this.logger.log(`No destinations section for ${stateName} — relying on Strategy 3 + curated fallback.`);
       }
 
-      // Strategy 2: If Strategy 1 found no cities, check specific Neighborhood / City filter legends
-      if (names.size === 0) {
-        this.logger.log(`Checking sidebar Neighborhood/Location filters...`);
-        const filterLabels = await page
-          .$$eval(
-            'fieldset:has(legend:has-text("Neighborhood")) label, fieldset:has(legend:has-text("Popular locations")) label, fieldset:has(legend:has-text("City")) label',
-            (labels) => labels.map((el) => el.textContent?.trim() || '').filter(Boolean),
-          )
-          .catch(() => []);
+      // Strategy 2 used to scrape the sidebar's "Popular locations"/"Neighborhood"
+      // filter as a city list. Verified live on 2026-09-08 (see expedia-selectors.ts
+      // header): that filter now only surfaces landmarks/neighbourhoods ("M.G.
+      // Road", "Bandipur National Park"), never city names — matching it would
+      // silently write landmarks into master_city, so it was removed rather than
+      // "fixed".
 
-        for (const raw of filterLabels) {
-          const cleaned = raw.replace(/\(\d+[\d,]*\)/g, '').trim();
-          if (isValidCityName(cleaned)) {
-            names.add(cleaned);
-          }
+      // Strategy 3: Extract locality/city directly from hotel cards (e.g.
+      // "Sakleshpur", "Horur") — this is the only strategy that doesn't depend
+      // on a "destinations" module existing at all, so it's the real backbone
+      // of discovery for states without one. Click "Show more" a few rounds
+      // first so the sample spans more of the state than just the first
+      // screenful of results (more cards -> more distinct localities).
+      this.logger.log(`Extracting cities from rendered hotel listing cards...`);
+      for (let round = 0; round < 4; round++) {
+        const showMore = await page.$(ExpediaSelectors.hotelList.showMoreButton);
+        if (!showMore) break;
+        const countBefore = await page.$$eval(ExpediaSelectors.hotelList.resultCard, (els) => els.length).catch(() => 0);
+        await showMore.click().catch(() => undefined);
+        await page
+          .waitForFunction(
+            ({ selector, countBefore }) => document.querySelectorAll(selector).length > countBefore,
+            { selector: ExpediaSelectors.hotelList.resultCard, countBefore },
+            { timeout: 10_000 },
+          )
+          .catch(() => undefined);
+        await page.waitForTimeout(500);
+      }
+      await page.evaluate(() => window.scrollBy(0, 1000)).catch(() => undefined);
+      await page.waitForTimeout(800);
+
+      const cardLocations = await page
+        .$$eval(
+          '[data-stid="lodging-card-responsive"], [data-stid="property-listing-results"] > div',
+          (cards) => {
+            return cards
+              .map((card) => {
+                const titleEl = card.querySelector('[data-stid="content-hotel-title"], h3, h4');
+                if (!titleEl) return '';
+                // Primary signal: the text node structurally right after the
+                // title (usually the locality). If that's empty — a layout
+                // variant where the title's own wrapper holds both — fall
+                // back to the title's parent's second line of text instead
+                // of giving up on the card entirely.
+                const nextEl = titleEl.nextElementSibling;
+                let raw = nextEl?.textContent?.trim() || '';
+                if (!raw) {
+                  const parentLines = (titleEl.parentElement?.textContent || '').split('\n').map((l) => l.trim()).filter(Boolean);
+                  raw = parentLines[1] || '';
+                }
+                return raw.split('\n')[0].split(',')[0].replace(/•.*/, '').replace(/\(.*?\)/g, '').trim();
+              })
+              .filter(Boolean);
+          },
+        )
+        .catch(() => []);
+
+      const beforeStrategy3 = names.size;
+      for (const loc of cardLocations) {
+        if (isValidCityName(loc)) {
+          names.add(loc);
         }
       }
+      this.logger.log(`Hotel-card extraction added ${names.size - beforeStrategy3} more valid cities (from ${cardLocations.length} candidate cards).`);
 
-      // Strategy 3: Extract locality/city directly from hotel cards (e.g. "Sakleshpur", "Horur")
-      if (names.size === 0) {
-        this.logger.log(`Extracting cities from rendered hotel listing cards...`);
-        await page.evaluate(() => window.scrollBy(0, 1000)).catch(() => undefined);
-        await page.waitForTimeout(800);
-
-        const cardLocations = await page
-          .$$eval(
-            '[data-stid="lodging-card-responsive"], [data-stid="property-listing-results"] > div',
-            (cards) => {
-              return cards
-                .map((card) => {
-                  const titleEl = card.querySelector('[data-stid="content-hotel-title"], h3, h4');
-                  if (!titleEl) return '';
-                  const nextEl = titleEl.nextElementSibling;
-                  const raw = nextEl?.textContent?.trim() || '';
-                  return raw.split('\n')[0].split(',')[0].replace(/•.*/, '').replace(/\(.*?\)/g, '').trim();
-                })
-                .filter(Boolean);
-            },
-          )
-          .catch(() => []);
-
-        for (const loc of cardLocations) {
-          if (isValidCityName(loc)) {
-            names.add(loc);
-          }
-        }
-      }
+      const organicCount = names.size;
 
       // Strategy 4: Supplement with curated major cities for this state
       const fallback = STATE_FALLBACK_CITIES[stateName.toLowerCase()];
@@ -172,7 +200,15 @@ export class RegionDiscoveryService {
         fallback.forEach((c) => names.add(c));
       }
 
-      this.logger.log(`Discovered ${names.size} valid cities: ${[...names].join(', ')}`);
+      if (organicCount === 0) {
+        this.logger.warn(
+          fallback
+            ? `No cities discovered live for ${stateName} — every result comes from the curated fallback list. Coverage may be incomplete.`
+            : `No cities discovered live for ${stateName} and no curated fallback exists for it — 0 cities found. Add an entry to STATE_FALLBACK_CITIES or investigate why both live strategies came back empty.`,
+        );
+      }
+
+      this.logger.log(`Discovered ${names.size} valid cities (${organicCount} live, ${names.size - organicCount} curated): ${[...names].join(', ')}`);
     } finally {
       await page.close();
     }

@@ -42,6 +42,13 @@ export class CityHotelsService {
     return hotels;
   }
 
+  /**
+   * Expedia's hotel list has no real pagination anymore — a "Show more
+   * stays" button appends more cards to the same page (infinite scroll)
+   * instead of navigating. So `maxPages` here means "how many times to
+   * click Show more", and cards are extracted once at the end rather than
+   * per page.
+   */
   private async scrapeHotelList(pagePromise: Promise<Page>, url: string, maxPages: number): Promise<DiscoveredHotel[]> {
     const page = await pagePromise;
     const byId = new Map<string, DiscoveredHotel>();
@@ -49,29 +56,42 @@ export class CityHotelsService {
     try {
       await this.browser.safeGoto(page, url);
 
-      for (let pageNum = 0; pageNum < maxPages; pageNum++) {
-        await page.waitForSelector(ExpediaSelectors.hotelList.resultCard, { timeout: 15_000 }).catch(() => {
-          this.logger.warn(`No result cards found on page ${pageNum + 1} for ${url}`);
-        });
+      await page.waitForSelector(ExpediaSelectors.hotelList.resultCard, { timeout: 15_000 }).catch(() => {
+        this.logger.warn(`No result cards found for ${url}`);
+      });
 
-        const links = await page.$$(ExpediaSelectors.hotelList.resultLink);
-        for (const link of links) {
-          const href = await link.getAttribute('href');
-          if (!href) continue;
-          const id = extractHotelId(href);
-          if (!id || byId.has(id)) continue;
+      for (let round = 0; round < maxPages - 1; round++) {
+        const showMore = await page.$(ExpediaSelectors.hotelList.showMoreButton);
+        if (!showMore) break;
 
-          const nameEl = await link.$(ExpediaSelectors.hotelList.resultName);
-          const name = (await (nameEl ?? link).innerText().catch(() => '')).trim();
-          const detailUrl = new URL(href, url).toString();
-          byId.set(id, { expediaHotelId: id, detailUrl, name });
-        }
+        const countBefore = await page.$$eval(ExpediaSelectors.hotelList.resultCard, (els) => els.length);
+        await showMore.click().catch(() => undefined);
+        await page
+          .waitForFunction(
+            ({ selector, countBefore }) => document.querySelectorAll(selector).length > countBefore,
+            { selector: ExpediaSelectors.hotelList.resultCard, countBefore },
+            { timeout: 10_000 },
+          )
+          .catch(() => undefined);
+        await page.waitForTimeout(500);
+      }
 
-        const nextButton = await page.$(ExpediaSelectors.hotelList.nextPageButton);
-        if (!nextButton) break;
-        await nextButton.click();
-        await page.waitForLoadState('domcontentloaded');
-        await page.waitForTimeout(1000);
+      const cards = await page.$$(ExpediaSelectors.hotelList.resultCard);
+      for (const card of cards) {
+        const link = await card.$(ExpediaSelectors.hotelList.resultLink);
+        const href = await link?.getAttribute('href');
+        if (!href) continue;
+        const id = extractHotelId(href);
+        if (!id || byId.has(id)) continue;
+
+        const name = await card
+          .$$eval(ExpediaSelectors.hotelList.resultHeading, (headings) =>
+            headings.map((h) => h.textContent?.trim() || '').find((t) => t && !/^photo gallery for/i.test(t)),
+          )
+          .catch(() => undefined);
+
+        const detailUrl = new URL(href, url).toString();
+        byId.set(id, { expediaHotelId: id, detailUrl, name: name ?? '' });
       }
     } finally {
       await page.close();
