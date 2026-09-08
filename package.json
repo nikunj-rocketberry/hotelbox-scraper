@@ -19,7 +19,10 @@
     "migration:revert": "npm run typeorm -- migration:revert -d src/database/data-source.ts",
     "seed:geo": "ts-node -r tsconfig-paths/register scripts/seed-geo.ts",
     "scrape:region": "ts-node -r tsconfig-paths/register scripts/trigger-region.ts",
-    "scrape:regions": "ts-node -r tsconfig-paths/register scripts/trigger-regions.ts"
+    "scrape:regions": "ts-node -r tsconfig-paths/register scripts/trigger-regions.ts",
+    "cooldown:reset": "ts-node -r tsconfig-paths/register scripts/reset-cooldown.ts",
+    "queue:clear": "ts-node -r tsconfig-paths/register scripts/clear-queues.ts",
+    "cities:clear": "ts-node -r tsconfig-paths/register scripts/clear-cities.ts"
   },
   "dependencies": {
     "@nestjs/bullmq": "^10.2.3",

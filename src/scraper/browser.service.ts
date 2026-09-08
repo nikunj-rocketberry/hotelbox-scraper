@@ -5,14 +5,15 @@ import { AppConfig } from '../config/configuration';
 import { AntiBotGuardService } from './anti-bot-guard.service';
 import { TrafficShaperService } from './traffic-shaper.service';
 
-const USER_AGENT =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
-
 /** Recycle a pooled context after this many jobs so per-context heap/JS-listener growth can't accumulate indefinitely across a long-running worker. */
 const MAX_USES_PER_CONTEXT = 100;
 
-/** We only ever read src/data-src *attributes* off img/video tags, never pixel data — safe to abort these outright rather than just cache them. */
-const BLOCKED_RESOURCE_TYPES = new Set(['image', 'media', 'font']);
+/**
+ * Abort heavy media (audio/video).
+ * NOTE: Do not block 'font' by default — modern anti-bot scripts (Akamai/Kasada)
+ * check for font loading (document.fonts.ready) and can flag contexts where fonts fail.
+ */
+const BLOCKED_RESOURCE_TYPES = new Set(['media']);
 
 interface PooledContext {
   context: BrowserContext;
@@ -97,7 +98,7 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
     const worthKeeping = pooled.uses < MAX_USES_PER_CONTEXT && this.browser?.isConnected();
 
     if (worthKeeping) {
-      await pooled.context.clearCookies().catch(() => undefined);
+      // Retain session/anti-bot cookies in the pooled context so Akamai verification tokens persist across jobs.
     } else {
       await pooled.context.close().catch(() => undefined);
       this.outstanding--;
@@ -120,15 +121,12 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
   private async createContext(): Promise<BrowserContext> {
     const browser = await this.getConnectedBrowser();
     const context = await browser.newContext({
-      userAgent: USER_AGENT,
-      viewport: { width: 1366, height: 900 },
+      viewport: { width: 1366, height: 768 },
       locale: 'en-IN',
+      timezoneId: 'Asia/Kolkata',
     });
 
     if (this.blockNonEssentialResources) {
-      // Set once per context (not per page/job) — Playwright applies a
-      // context-level route to every page opened from it, including ones
-      // created after this call, so pooled reuse keeps the same routing.
       await context.route('**/*', (route) => {
         const type = route.request().resourceType();
         return BLOCKED_RESOURCE_TYPES.has(type) ? route.abort() : route.continue();
@@ -150,7 +148,30 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
     await this.antiBotGuard.assertNotBlocked();
     await this.trafficShaper.acquire();
     await this.jitterDelay();
-    const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: timeoutMs });
+
+    const baseUrl = this.config.get('scraper.expediaBaseUrl', { infer: true });
+
+    // Akamai Bot Manager blocks cold direct hits to /Hotel-Search if no session exists.
+    // If context has no cookies yet, visit homepage first to establish session and sensor cookies.
+    const cookies = await page.context().cookies();
+    if (cookies.length === 0 && url.includes('/Hotel-Search')) {
+      this.logger.log(`Warming up session on homepage (${baseUrl}) to acquire anti-bot trust cookies...`);
+      try {
+        const homeRes = await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: timeoutMs });
+        this.logger.log(`Homepage responded: ${homeRes?.status()} — waiting 4s for anti-bot telemetry handshake...`);
+        await page.waitForTimeout(4000);
+      } catch (err) {
+        this.logger.warn(`Homepage warm-up navigation notice: ${(err as Error).message}`);
+      }
+    }
+
+    this.logger.log(`Navigating to target: ${url}`);
+    const response = await page.goto(url, {
+      waitUntil: 'domcontentloaded',
+      timeout: timeoutMs,
+      referer: baseUrl,
+    });
+    this.logger.log(`Target responded with status: ${response?.status()}`);
     const blockReason = await this.antiBotGuard.checkPage(page, response?.status());
     if (blockReason) {
       throw new Error(`Blocked by Expedia anti-bot (${blockReason}) while loading ${url}`);
@@ -183,11 +204,33 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async launch(): Promise<Browser> {
-    const browser = await chromium.launch({
+    const launchOptions = {
+      channel: 'chrome',
       headless: this.config.get('scraper.headless', { infer: true }),
-    });
-    browser.on('disconnected', () => this.logger.warn('Chromium process exited'));
-    this.logger.log('Chromium launched');
-    return browser;
+      args: [
+        '--disable-blink-features=AutomationControlled',
+        '--disable-features=IsolateOrigins,site-per-process',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-infobars',
+        '--window-position=0,0',
+        '--ignore-certificate-errors',
+        '--ignore-certificate-errors-spki-list',
+      ],
+      ignoreDefaultArgs: ['--enable-automation'],
+    };
+
+    try {
+      const browser = await chromium.launch(launchOptions);
+      browser.on('disconnected', () => this.logger.warn('Browser process exited'));
+      this.logger.log('Google Chrome launched with stealth patches');
+      return browser;
+    } catch {
+      delete (launchOptions as any).channel;
+      const browser = await chromium.launch(launchOptions);
+      browser.on('disconnected', () => this.logger.warn('Browser process exited'));
+      this.logger.log('Bundled Chromium launched with stealth patches');
+      return browser;
+    }
   }
 }

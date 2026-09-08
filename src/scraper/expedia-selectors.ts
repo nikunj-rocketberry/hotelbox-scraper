@@ -17,10 +17,11 @@
 export const ExpediaSelectors = {
   search: {
     // "Destinations in <State>" section on a region-level search results page
-    destinationsSection: '[data-stid="destination-recommendations"], section:has-text("Destinations in")',
-    destinationCategoryTabs: '[data-stid="destination-recommendations"] [role="tab"]',
-    destinationCityCard: '[data-stid="destination-recommendations"] a[href*="/Hotel-Search"]',
-    destinationCityName: '[data-stid*="destination-name"], h3, [class*="title"]',
+    destinationsSection:
+      '[data-stid="destination-recommendations"], section:has-text("Destinations in"), div:has(> h2:has-text("Destinations in")), div:has(> h3:has-text("Destinations in"))',
+    destinationCategoryTabs: '[role="tab"], button[data-stid*="tab"]',
+    destinationCityCard: 'a[href*="/Hotel-Search"], a[href*="destinations"], a[data-stid*="destination"], a:has(h3), a:has(h4)',
+    destinationCityName: '[data-stid*="destination-name"], h3, h4, [class*="title"], [class*="name"]',
   },
   hotelList: {
     resultCard: '[data-stid="property-listing-results"] [data-stid="lodging-card-responsive"]',

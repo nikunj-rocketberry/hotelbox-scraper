@@ -20,6 +20,8 @@ const BLOCK_SIGNALS: Array<{ pattern: RegExp; reason: string }> = [
   { pattern: /too many requests/i, reason: 'rate-limited' },
   { pattern: /just a moment/i, reason: 'cloudflare-challenge' },
   { pattern: /unusual traffic/i, reason: 'unusual-traffic' },
+  { pattern: /bot or not/i, reason: 'expedia-bot-challenge' },
+  { pattern: /show us your human side/i, reason: 'expedia-bot-challenge' },
 ];
 
 /**
