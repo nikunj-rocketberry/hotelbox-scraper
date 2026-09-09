@@ -13,6 +13,36 @@ export interface DiscoveredCity {
   cityName: string;
 }
 
+/** A hotel harvested directly from a state-wide search sweep (states with no "Destinations in <State>" module — see discoverCities()). */
+export interface DiscoveredStateHotel {
+  expediaHotelId: string;
+  detailUrl: string;
+  name: string;
+  /** Best-effort locality mined from the hotel-detail URL slug — used to attach a cityId when it matches a discovered city. */
+  locality?: string;
+}
+
+/** Expedia property URLs embed the property id as `.h<digits>.` — e.g. `...h1234567.Hotel-Information` */
+function extractHotelId(href: string): string | null {
+  const match = href.match(/\.h(\d+)\./);
+  return match ? match[1] : null;
+}
+
+/**
+ * Expedia hotel-detail URL slugs always start with the locality name, e.g.
+ * `/Bengaluru-Hotels-Holiday-Inn-...`, `/Somvarpet-Hotels-Timbertales-...`.
+ * This is far more reliable than mining locality text out of the rendered
+ * card (see expedia-selectors.ts header) — verified live on 2026-09-08
+ * across an 18-card Karnataka listing with zero misses.
+ */
+function extractLocalityFromHref(href: string): string | undefined {
+  const path = href.split('?')[0];
+  const match = path.match(/^\/([A-Za-z]+(?:-[A-Za-z]+)*)-Hotels?-/);
+  if (!match) return undefined;
+  const name = match[1].replace(/-/g, ' ').trim();
+  return isValidCityName(name) ? name : undefined;
+}
+
 /**
  * Stage 1 of the pipeline: given a state, find every city Expedia surfaces
  * under that state's "Destinations in <State>" recommendation module
@@ -56,11 +86,23 @@ export class RegionDiscoveryService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async discoverCities(params: { countryId: string; countryName: string; stateId: string; stateName: string }): Promise<DiscoveredCity[]> {
+  /**
+   * Returns both the discovered cities AND (only for states with no
+   * "Destinations in <State>" module — e.g. Karnataka) the hotels harvested
+   * directly from that same state-wide sweep, so the caller can enqueue them
+   * for detail-scraping immediately instead of waiting on a second,
+   * redundant per-city search. See RegionDiscoveryProcessor.
+   */
+  async discoverCities(params: {
+    countryId: string;
+    countryName: string;
+    stateId: string;
+    stateName: string;
+  }): Promise<{ cities: DiscoveredCity[]; hotels: DiscoveredStateHotel[] }> {
     const destination = `${params.stateName}, ${params.countryName}`;
     const url = buildHotelSearchUrl(this.config.get('scraper.expediaBaseUrl', { infer: true }), destination, this.config.get('scraper.searchStayNights', { infer: true }));
 
-    const cityNames = await this.browser.withContext((context) => this.scrapeCityNames(context.newPage(), url, params.stateName));
+    const { cityNames, hotels } = await this.browser.withContext((context) => this.scrapePage(context.newPage(), url, params.stateName));
 
     const seen = new Set<string>();
     const results: DiscoveredCity[] = [];
@@ -79,13 +121,17 @@ export class RegionDiscoveryService {
       results.push({ cityId, cityName: normalized });
     }
 
-    this.logger.log(`Discovered ${results.length} valid cities in ${params.stateName}: ${results.map((r) => r.cityName).join(', ')}`);
-    return results;
+    this.logger.log(
+      `Discovered ${results.length} valid cities in ${params.stateName}: ${results.map((r) => r.cityName).join(', ')}` +
+        (hotels.length ? ` (+ ${hotels.length} hotels harvested directly from the state-wide sweep)` : ''),
+    );
+    return { cities: results, hotels };
   }
 
-  private async scrapeCityNames(pagePromise: Promise<Page>, url: string, stateName: string): Promise<string[]> {
+  private async scrapePage(pagePromise: Promise<Page>, url: string, stateName: string): Promise<{ cityNames: string[]; hotels: DiscoveredStateHotel[] }> {
     const page = await pagePromise;
     const names = new Set<string>();
+    const hotelsById = new Map<string, DiscoveredStateHotel>();
 
     try {
       await this.browser.safeGoto(page, url);
@@ -114,9 +160,24 @@ export class RegionDiscoveryService {
 
           const cards = await section.$$(ExpediaSelectors.search.destinationCityCard);
           for (const card of cards) {
-            const nameEl = await card.$(ExpediaSelectors.search.destinationCityName).catch(() => null);
-            let text = (await (nameEl ?? card).innerText().catch(() => '')).trim();
-            text = text.split('\n')[0].replace(/hotels?|properties|destinations?/gi, '').trim();
+            // Primary signal: these cards render their visible name as an
+            // <img>, not text — the only text content is an sr-only
+            // "Opens <name> in new tab" label. The card's own href always
+            // carries a clean `destination=<name>` query param instead, so
+            // read that first and only fall back to text-scraping (with the
+            // "Opens ... in new tab" wrapper stripped) when there's no href.
+            const href = await card.getAttribute('href').catch(() => null);
+            let text = href ? (new URL(href, url).searchParams.get('destination') ?? '') : '';
+            if (!text) {
+              const nameEl = await card.$(ExpediaSelectors.search.destinationCityName).catch(() => null);
+              text = (await (nameEl ?? card).innerText().catch(() => '')).trim();
+              text = text
+                .split('\n')[0]
+                .replace(/^opens\s+/i, '')
+                .replace(/\s+in\s+new\s+(tab|window)$/i, '')
+                .replace(/hotels?|properties|destinations?/gi, '')
+                .trim();
+            }
             if (isValidCityName(text)) {
               names.add(text);
             }
@@ -124,7 +185,7 @@ export class RegionDiscoveryService {
         }
         this.logger.log(`Destinations section yielded ${names.size} valid cities so far.`);
       } else {
-        this.logger.log(`No destinations section for ${stateName} — relying on Strategy 3 + curated fallback.`);
+        this.logger.log(`No destinations section for ${stateName} — this is a pure hotel-list state: harvesting its hotels directly instead of just mining city names from them.`);
       }
 
       // Strategy 2 used to scrape the sidebar's "Popular locations"/"Neighborhood"
@@ -134,13 +195,14 @@ export class RegionDiscoveryService {
       // silently write landmarks into master_city, so it was removed rather than
       // "fixed".
 
-      // Strategy 3: Extract locality/city directly from hotel cards (e.g.
-      // "Sakleshpur", "Horur") — this is the only strategy that doesn't depend
-      // on a "destinations" module existing at all, so it's the real backbone
-      // of discovery for states without one. Click "Show more" a few rounds
-      // first so the sample spans more of the state than just the first
-      // screenful of results (more cards -> more distinct localities).
-      this.logger.log(`Extracting cities from rendered hotel listing cards...`);
+      // Strategy 3: walk the rendered hotel-list cards. Always the backbone
+      // for states with no destinations module (only signal available at
+      // all), and a useful supplement even when Strategy 1 found something.
+      // Click "Show more" a few rounds first so the sample spans more of the
+      // state than just the first screenful (more cards -> more distinct
+      // localities, and — for no-destinations states — more hotels harvested
+      // in this same pass instead of needing a second per-city search later).
+      this.logger.log(`Extracting cities${section ? '' : ' and hotels'} from rendered hotel listing cards...`);
       for (let round = 0; round < 4; round++) {
         const showMore = await page.$(ExpediaSelectors.hotelList.showMoreButton);
         if (!showMore) break;
@@ -158,39 +220,35 @@ export class RegionDiscoveryService {
       await page.evaluate(() => window.scrollBy(0, 1000)).catch(() => undefined);
       await page.waitForTimeout(800);
 
-      const cardLocations = await page
-        .$$eval(
-          '[data-stid="lodging-card-responsive"], [data-stid="property-listing-results"] > div',
-          (cards) => {
-            return cards
-              .map((card) => {
-                const titleEl = card.querySelector('[data-stid="content-hotel-title"], h3, h4');
-                if (!titleEl) return '';
-                // Primary signal: the text node structurally right after the
-                // title (usually the locality). If that's empty — a layout
-                // variant where the title's own wrapper holds both — fall
-                // back to the title's parent's second line of text instead
-                // of giving up on the card entirely.
-                const nextEl = titleEl.nextElementSibling;
-                let raw = nextEl?.textContent?.trim() || '';
-                if (!raw) {
-                  const parentLines = (titleEl.parentElement?.textContent || '').split('\n').map((l) => l.trim()).filter(Boolean);
-                  raw = parentLines[1] || '';
-                }
-                return raw.split('\n')[0].split(',')[0].replace(/•.*/, '').replace(/\(.*?\)/g, '').trim();
-              })
-              .filter(Boolean);
-          },
-        )
-        .catch(() => []);
-
+      const cards = await page.$$(ExpediaSelectors.hotelList.resultCard);
       const beforeStrategy3 = names.size;
-      for (const loc of cardLocations) {
-        if (isValidCityName(loc)) {
-          names.add(loc);
-        }
+      for (const card of cards) {
+        const link = await card.$(ExpediaSelectors.hotelList.resultLink);
+        const href = await link?.getAttribute('href');
+        if (!href) continue;
+
+        const locality = extractLocalityFromHref(href);
+        if (locality) names.add(locality);
+
+        // Only harvest full hotel records when there's no destinations
+        // module — states that have one already get their hotels via the
+        // normal per-city search, so harvesting here too would just be
+        // redundant scraping (the two paths converge on the same
+        // `hotel-${expediaHotelId}` BullMQ jobId downstream regardless, so
+        // it's not a correctness issue, just wasted Playwright time).
+        if (section) continue;
+
+        const id = extractHotelId(href);
+        if (!id || hotelsById.has(id)) continue;
+        const name = await card
+          .$$eval(ExpediaSelectors.hotelList.resultHeading, (headings) =>
+            headings.map((h) => h.textContent?.trim() || '').find((t) => t && !/^photo gallery for/i.test(t)),
+          )
+          .catch(() => undefined);
+        const detailUrl = new URL(href, url).toString();
+        hotelsById.set(id, { expediaHotelId: id, detailUrl, name: name ?? '', locality });
       }
-      this.logger.log(`Hotel-card extraction added ${names.size - beforeStrategy3} more valid cities (from ${cardLocations.length} candidate cards).`);
+      this.logger.log(`Hotel-card extraction added ${names.size - beforeStrategy3} more valid cities (from ${cards.length} candidate cards)${section ? '' : `, harvested ${hotelsById.size} hotels`}.`);
 
       const organicCount = names.size;
 
@@ -213,6 +271,6 @@ export class RegionDiscoveryService {
       await page.close();
     }
 
-    return [...names];
+    return { cityNames: [...names], hotels: [...hotelsById.values()] };
   }
 }

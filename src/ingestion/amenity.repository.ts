@@ -13,7 +13,12 @@ export class AmenityRepository {
   }
 
   private async batchGetOrCreateIds(manager: EntityManager, table: 'master_hotel_aminties' | 'master_room_aminties', allNames: string[]): Promise<Map<string, string>> {
-    const unique = [...new Set(allNames.map((n) => n.trim()).filter(Boolean))];
+    // Last-resort safety net: the scraper already filters out overlong (non-
+    // amenity) strings at the source, but this table's `name` column is
+    // varchar(150) regardless of where a name came from (e.g. an unfiltered
+    // schema.org amenityFeature) — one oversized string here previously
+    // failed the entire batch insert, not just that one row.
+    const unique = [...new Set(allNames.map((n) => n.trim().slice(0, 150)).filter(Boolean))];
     if (unique.length === 0) return new Map();
 
     const rows = await manager.query(

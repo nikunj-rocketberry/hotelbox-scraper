@@ -149,6 +149,12 @@ export class HotelDetailService {
 
         const jsonLd = await extractLodgingJsonLd(page);
 
+        // "See all about this property" opens a dialog with the richest
+        // amenities/description/languages data on the page — see
+        // scrapeAboutDialog(). Best-effort: if the button or dialog isn't
+        // found, everything below just falls back to its previous source.
+        const aboutDialog = await this.scrapeAboutDialog(page);
+
         const name = (await textOf(page, ExpediaSelectors.hotelDetail.name)) ?? (await textOf(page, 'h1')) ?? jsonLd?.name ?? 'Unknown Hotel';
 
         // Star class is only exposed as visually-hidden text ("Property class: 5
@@ -166,17 +172,27 @@ export class HotelDetailService {
         const latitude = toNumber(jsonLd?.geo?.latitude as string | undefined);
         const longitude = toNumber(jsonLd?.geo?.longitude as string | undefined);
         const phone = (await textOf(page, ExpediaSelectors.hotelDetail.phone)) ?? jsonLd?.telephone;
-        const fullDescription = (await textOf(page, ExpediaSelectors.hotelDetail.description)) ?? jsonLd?.description;
+        const fullDescription = aboutDialog.fullDescription ?? (await textOf(page, ExpediaSelectors.hotelDetail.description)) ?? jsonLd?.description;
+        const headline = aboutDialog.headline;
         const propertyType = Array.isArray(jsonLd?.['@type']) ? jsonLd?.['@type'][0] : jsonLd?.['@type'];
 
         const checkInText = await this.policyText(page, 'Check-in');
         const checkOutText = await this.policyText(page, 'Check-out');
         const checkInInstructions = await this.policyText(page, 'Special check-in instructions');
         const petPolicyText = await this.policyText(page, 'Pets');
+        const childrenPolicy = await this.policyText(page, 'Children and extra beds');
+        const optionalFees = await this.policyText(page, 'Optional extras');
+        const youNeedToKnow = await this.policyText(page, 'You need to know');
+        const weShouldMention = await this.policyText(page, 'We should mention');
+        const knowBeforeYouGo = [youNeedToKnow, weShouldMention].filter(Boolean).join('\n') || undefined;
 
         const checkInTime = extractTime(checkInText);
         const checkOutTime = extractTime(checkOutText);
         const petPolicy = petPolicyText?.slice(0, 255);
+
+        // Standalone "Accessibility" section (not inside any dialog) — see
+        // scrapeAccessibility(). Best-effort, same as everything else here.
+        const accessibility = await this.scrapeAccessibility(page);
 
         // Best-effort: Expedia frequently doesn't render a dedicated
         // property-level amenities section on this page template at all (see
@@ -190,7 +206,7 @@ export class HotelDetailService {
         const jsonLdAmenities = (jsonLd?.amenityFeature ?? [])
           .map((a) => (typeof a === 'string' ? a : a.value === false ? undefined : a.name))
           .filter((a): a is string => !!a);
-        const amenities = [...new Set([...domAmenities, ...jsonLdAmenities])];
+        const amenities = [...new Set([...domAmenities, ...jsonLdAmenities, ...aboutDialog.amenities])];
 
         const media = await this.scrapeHotelPhotos(page, jsonLd);
         const rooms = await this.scrapeRooms(page);
@@ -199,6 +215,7 @@ export class HotelDetailService {
           expediaHotelId,
           sourceUrl: detailUrl,
           name,
+          headline,
           propertyType,
           starRating,
           guestRating,
@@ -213,6 +230,12 @@ export class HotelDetailService {
           checkOutTime,
           checkInInstructions,
           petPolicy,
+          childrenPolicy,
+          optionalFees,
+          knowBeforeYouGo,
+          spokenLanguages: aboutDialog.spokenLanguages,
+          accessibilityNotes: accessibility.notes,
+          accessibilityFeatures: accessibility.features,
           amenities,
           media,
           rooms,
@@ -265,9 +288,163 @@ export class HotelDetailService {
         if (!container) return [];
         return Array.from(container.querySelectorAll('li'))
           .map((li) => li.textContent?.trim() || '')
-          .filter(Boolean);
+          .filter((t) => t && t.length <= 150); // master_hotel_aminties.name is varchar(150) — see scrapeAboutDialog()
       }, headingPatternSource)
       .catch(() => []);
+  }
+
+  /**
+   * Closes whatever dialog is currently open (Escape is universal across
+   * every dialog variant on this page) and waits for it to actually unmount
+   * before the caller resumes interacting with the base page.
+   *
+   * Waiting for `[role="dialog"]` to detach isn't enough on its own: the
+   * dialog's wrapping overlay layer (`.uitk-dialog-layer...layer-overlay-
+   * active`, one per opened room-info dialog) can outlive that node during
+   * its close transition, and — since it's `position: fixed` over the whole
+   * viewport — keeps intercepting clicks on whatever's underneath (e.g. the
+   * next room card's "More details" button) until it's actually gone.
+   * Observed live: this turned into 30s click timeouts between rooms.
+   */
+  private async closeDialog(page: Page): Promise<void> {
+    await page.keyboard.press('Escape').catch(() => undefined);
+    await page.waitForSelector(ExpediaSelectors.hotelDetail.dialog, { state: 'detached', timeout: 5_000 }).catch(() => undefined);
+    await page.waitForSelector('.layer-overlay-active', { state: 'detached', timeout: 3_000 }).catch(() => undefined);
+  }
+
+  /**
+   * "See all about this property" opens a dialog (client-side state only, no
+   * navigation) with two tabs:
+   *  - "Amenities": every property amenity, grouped under category headings
+   *    (Internet, Parking, Pool, ...) — this is the actual amenities list;
+   *    the on-page amenitiesHeadingPattern fallback usually finds nothing
+   *    because Expedia doesn't render a standalone amenities section outside
+   *    this dialog on this page template (see expedia-selectors.ts header).
+   *  - "About": a headline, the full property description, a "Room
+   *    features" blurb, and a "Languages" line — richer than the
+   *    `sp-content-text` paragraph scraped on the base page.
+   * Best-effort throughout: any missing button/tab/panel just degrades that
+   * field to empty/undefined, same philosophy as the rest of this file.
+   */
+  private async scrapeAboutDialog(page: Page): Promise<{ amenities: string[]; headline?: string; fullDescription?: string; spokenLanguages?: string[] }> {
+    const empty = { amenities: [] as string[], headline: undefined, fullDescription: undefined, spokenLanguages: undefined };
+    try {
+      const trigger = await page.$(ExpediaSelectors.hotelDetail.aboutDialogTrigger);
+      if (!trigger) return empty;
+
+      await trigger.scrollIntoViewIfNeeded().catch(() => undefined);
+      await trigger.click();
+      const dialog = await page.waitForSelector(ExpediaSelectors.hotelDetail.dialog, { timeout: 8_000 }).catch(() => null);
+      if (!dialog) return empty;
+
+      const tabs = await dialog.$$(ExpediaSelectors.hotelDetail.dialogTab);
+      const findTab = async (label: string) => {
+        for (const tab of tabs) {
+          const text = (await tab.innerText().catch(() => '')).trim();
+          if (text.toLowerCase() === label.toLowerCase()) return tab;
+        }
+        return null;
+      };
+
+      const amenitiesTab = await findTab('Amenities');
+      let amenities: string[] = [];
+      if (amenitiesTab) {
+        await amenitiesTab.click().catch(() => undefined);
+        await page.waitForTimeout(300);
+        const panelId = await amenitiesTab.getAttribute('aria-controls').catch(() => null);
+        if (panelId) {
+          // Same length guard as scrapeRoomInfoDialog(): a few category
+          // blocks in this panel (e.g. "Special check-in instructions"-style
+          // contact text under "Accessibility") are full sentences, not
+          // short tags, and exceed master_hotel_aminties.name's varchar(150).
+          amenities = await page
+            .evaluate((id) => {
+              const panel = document.getElementById(id);
+              if (!panel) return [];
+              return Array.from(panel.querySelectorAll('li'))
+                .map((li) => li.textContent?.trim() || '')
+                .filter((t) => t && t.length <= 150);
+            }, panelId)
+            .catch(() => []);
+        }
+      }
+
+      const aboutTab = await findTab('About');
+      let headline: string | undefined;
+      let fullDescription: string | undefined;
+      let spokenLanguages: string[] | undefined;
+      if (aboutTab) {
+        await aboutTab.click().catch(() => undefined);
+        await page.waitForTimeout(300);
+        const panelId = await aboutTab.getAttribute('aria-controls').catch(() => null);
+        if (panelId) {
+          const parsed = await page
+            .evaluate((id) => {
+              const panel = document.getElementById(id);
+              if (!panel) return [] as string[];
+              return (panel.innerText || '')
+                .split('\n')
+                .map((l) => l.trim())
+                .filter(Boolean);
+            }, panelId)
+            .catch(() => [] as string[]);
+
+          // Line-based, not DOM-structural, on purpose: the panel's own
+          // headings ("About this property", "Room features", "Languages")
+          // are stable text anchors even if the wrapping markup changes.
+          const roomFeaturesIdx = parsed.findIndex((l) => l === 'Room features');
+          const languagesIdx = parsed.findIndex((l) => l === 'Languages');
+          const descEnd = roomFeaturesIdx > -1 ? roomFeaturesIdx : languagesIdx > -1 ? languagesIdx : parsed.length;
+          headline = parsed[1];
+          fullDescription = parsed.slice(2, descEnd).join(' ') || undefined;
+          if (languagesIdx > -1 && parsed[languagesIdx + 1]) {
+            spokenLanguages = parsed[languagesIdx + 1]
+              .split(/,\s*|\s+and\s+/i)
+              .map((s) => s.trim())
+              .filter(Boolean);
+          }
+        }
+      }
+
+      await this.closeDialog(page);
+      return { amenities: [...new Set(amenities)], headline, fullDescription, spokenLanguages };
+    } catch (err) {
+      this.logger.warn(`About-property dialog scrape failed, continuing without it: ${(err as Error).message}`);
+      await this.closeDialog(page);
+      return empty;
+    }
+  }
+
+  /**
+   * Standalone "Accessibility" section on the base page (not inside any
+   * dialog) — an intro note plus a "Common areas" list of wheelchair-access
+   * features. Scoped to `heading.parentElement.parentElement` rather than
+   * `closest('section')`: on this page template `section` wraps the ENTIRE
+   * page content (verified live 2026-09-08 — closest('section') pulled in
+   * 184 unrelated <li> from reviews/nav), while two levels up from the
+   * heading is exactly this section's own wrapper.
+   */
+  private async scrapeAccessibility(page: Page): Promise<{ notes?: string; features: string[] }> {
+    return page
+      .evaluate(() => {
+        const heading = Array.from(document.querySelectorAll('h1, h2, h3, h4')).find((h) => h.textContent?.trim() === 'Accessibility');
+        if (!heading?.parentElement?.parentElement) return { notes: undefined, features: [] };
+        const container = heading.parentElement.parentElement;
+
+        const features = Array.from(container.querySelectorAll('li'))
+          .map((li) => li.textContent?.trim() || '')
+          .filter(Boolean);
+
+        const lines = ((container as HTMLElement).innerText || '')
+          .split('\n')
+          .map((l) => l.trim())
+          .filter(Boolean);
+        const commonAreasIdx = lines.findIndex((l) => l === 'Common areas');
+        const notes = lines.slice(1, commonAreasIdx > -1 ? commonAreasIdx : lines.length).join(' ') || undefined;
+
+        return { notes, features };
+      })
+      .catch(() => ({ notes: undefined, features: [] }));
   }
 
   /** Scrolls the page down in increments so sections that only mount on scroll (rooms, amenities, review summary) have a chance to render before extraction reads the DOM. Bounded and best-effort — never blocks a scrape on it. */
@@ -317,6 +494,13 @@ export class HotelDetailService {
    * `<ul>`, so it's categorized here by pattern-matching each item's text.
    */
   private async scrapeRooms(page: Page): Promise<ScrapedRoom[]> {
+    // scrapeHotelPhotos() (called just before this) opens the photo gallery
+    // dialog and deliberately leaves it open — harmless there since nothing
+    // after it used to touch dialogs. Now something does (the room-info
+    // dialog below), so start from a clean slate rather than risking two
+    // `[role="dialog"]` elements coexisting.
+    await this.closeDialog(page);
+
     const cards = await page.$$(ExpediaSelectors.rooms.roomCard);
     const rooms: ScrapedRoom[] = [];
 
@@ -360,6 +544,18 @@ export class HotelDetailService {
           }
         }
 
+        // Two cards can share the same base room name ("Standard Room") but
+        // differ only by bed configuration ("2 Single Beds" vs "1 King
+        // Bed") — the DB dedupes rooms by (hotel_id, room_name), so without
+        // this they'd silently collapse into one row. Most Expedia listings
+        // already bake the bed type into the display name (e.g. "Room, 2
+        // Single Beds"), in which case this is a no-op; only append when
+        // it's genuinely missing.
+        const roomName = bedType && !name.toLowerCase().includes(bedType.toLowerCase()) ? `${name} - ${bedType}` : name;
+
+        const dialogAmenities = await this.scrapeRoomInfoDialog(page, card);
+        const allAmenities = [...new Set([...amenities, ...dialogAmenities])];
+
         const media = await card
           .$$eval('img', (imgs) =>
             imgs
@@ -381,11 +577,11 @@ export class HotelDetailService {
           .catch(() => [] as string[]);
 
         rooms.push({
-          name,
+          name: roomName,
           maxOccupancy,
           bedType,
           areaSqft,
-          amenities,
+          amenities: allAmenities,
           media: [...new Set(media)].slice(0, this.maxRoomMediaCount).map((url) => ({ url })),
         });
       } catch (err) {
@@ -394,5 +590,72 @@ export class HotelDetailService {
     }
 
     return rooms;
+  }
+
+  /**
+   * Each room card has TWO "More details" buttons with identical visible
+   * text — one opens a rate "Extras" upsell popup (class
+   * `uitk-more-info-trigger`), the other opens `propertyUnitRoomInfoDialog=`
+   * with a "Room amenities" list categorized by Bathroom/Bedroom/
+   * Entertainment/Safety/... — considerably richer than the flat <li> list
+   * on the card itself. Best-effort: falls back to an empty list (the
+   * card-level amenities still apply) if the button/dialog isn't found.
+   */
+  private async scrapeRoomInfoDialog(page: Page, card: ElementHandle<SVGElement | HTMLElement>): Promise<string[]> {
+    try {
+      const buttons = await card.$$('button');
+      let roomInfoButton: ElementHandle<HTMLElement | SVGElement> | null = null;
+      for (const btn of buttons) {
+        const cls = (await btn.getAttribute('class').catch(() => '')) || '';
+        if (cls.includes(ExpediaSelectors.rooms.roomInfoMoreDetailsButtonExcludeClass)) continue;
+        // innerText is 2 lines here — the visible "More details" plus a
+        // hidden "More details for " sr-only suffix span (verified live
+        // 2026-09-08) — so match on the first line, not full equality.
+        const text = (await btn.innerText().catch(() => '')).trim();
+        if (text.split('\n')[0].trim() === 'More details') {
+          roomInfoButton = btn;
+          break;
+        }
+      }
+      if (!roomInfoButton) return [];
+
+      await roomInfoButton.scrollIntoViewIfNeeded().catch(() => undefined);
+      try {
+        // Short timeout so a stuck overlay from a previous room's dialog
+        // (see closeDialog()) fails fast instead of eating the default 30s.
+        await roomInfoButton.click({ timeout: 8_000 });
+      } catch {
+        // Fall back to a forced click, bypassing Playwright's actionability/
+        // interception check — safe here since roomInfoButton was already
+        // resolved to the exact right element above (class + text filtered),
+        // not a blind selector guess that force could click on the wrong thing.
+        await roomInfoButton.click({ force: true, timeout: 5_000 });
+      }
+      const dialog = await page.waitForSelector(ExpediaSelectors.hotelDetail.dialog, { timeout: 6_000 }).catch(() => null);
+      if (!dialog) return [];
+
+      // Real amenity tags are short ("Wheelchair-accessible parking"); this
+      // heading's container also brackets a few full-sentence blurbs (review
+      // call-outs, contact instructions) that are NOT amenities and blow
+      // past master_room_aminties.name's varchar(150) — drop anything that
+      // long rather than let one long string fail the whole ingest batch.
+      const amenities = await page
+        .evaluate(() => {
+          const heading = Array.from(document.querySelectorAll('h1, h2, h3, h4')).find((h) => h.textContent?.trim() === 'Room amenities');
+          const container = heading?.closest('section');
+          if (!container) return [];
+          return Array.from(container.querySelectorAll('li'))
+            .map((li) => li.textContent?.trim() || '')
+            .filter((t) => t && t.length <= 150);
+        })
+        .catch(() => []);
+
+      await this.closeDialog(page);
+      return amenities;
+    } catch (err) {
+      this.logger.warn(`Room-info dialog scrape failed, continuing with card-level amenities only: ${(err as Error).message}`);
+      await this.closeDialog(page).catch(() => undefined);
+      return [];
+    }
   }
 }

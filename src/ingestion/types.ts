@@ -47,6 +47,12 @@ export interface ScrapedHotel {
   checkOutTime?: string;
   checkInInstructions?: string;
   petPolicy?: string;
+  childrenPolicy?: string;
+  optionalFees?: string;
+  knowBeforeYouGo?: string;
+  spokenLanguages?: string[];
+  accessibilityNotes?: string;
+  accessibilityFeatures?: string[];
   amenities: string[];
   media: ScrapedMedia[];
   rooms: ScrapedRoom[];

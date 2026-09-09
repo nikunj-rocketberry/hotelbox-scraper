@@ -24,11 +24,14 @@ async function main() {
   ];
 
   for (const q of queues) {
-    await q.drain();
-    await q.clean(0, 1000, 'failed');
-    await q.clean(0, 1000, 'wait');
-    await q.clean(0, 1000, 'delayed');
-    console.log(`[CleanUp] Cleared queue: ${q.name}`);
+    // obliterate() removes the queue's jobs in EVERY state — active,
+    // waiting, completed, failed, delayed, paused — unlike drain()/clean(),
+    // which only ever touched waiting/delayed/failed and left active and
+    // completed jobs behind. force:true is required because it also
+    // bypasses the "no active jobs" guard; stop the worker process first if
+    // you want a clean stop rather than yanking jobs mid-processing.
+    await q.obliterate({ force: true });
+    console.log(`[CleanUp] Obliterated queue (all states: active/waiting/completed/failed/delayed/paused): ${q.name}`);
     await q.close();
   }
 

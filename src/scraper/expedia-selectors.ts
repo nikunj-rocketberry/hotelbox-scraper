@@ -38,17 +38,32 @@
  *     (infinite-scroll style), so `hotelList.showMoreButton` must be
  *     clicked-and-waited-for-growth rather than clicked-and-navigated.
  *
- * `search` (region/city discovery) was NOT confirmed live: Expedia's
- * "Destinations in <State>" recommendation module used by Strategy 1 no
- * longer appears on a state-level search at all (checked Karnataka) — the
- * state search just returns a normal hotel list for the whole state. The
- * sidebar's "Popular locations" filter (Strategy 2 in region-discovery.
- * service.ts) does still exist, but only surfaces landmarks/neighbourhoods
- * ("M.G. Road", "Bandipur National Park"), not city names, so it was
- * removed rather than "fixed" — matching those selectors would have
- * silently written landmarks into master_city. Keep an eye on this: city
- * discovery for a new state currently depends entirely on the curated
- * `STATE_FALLBACK_CITIES` map in region-discovery.service.ts.
+ * `search` (region/city discovery) re-verified live on 2026-09-08 via
+ * Playwright MCP: the "Destinations in <State>" module DOES still exist on
+ * some states (confirmed on Rajasthan) but not others (confirmed absent on
+ * Karnataka, which returns a plain state-wide hotel list instead) — so
+ * region-discovery.service.ts must handle both. Two things found broken:
+ *   - Destination cards on states that DO have the module render their
+ *     visible name as an <img>, with the only text content being a
+ *     visually-hidden `<span class="is-visually-hidden">Opens Jaipur in new
+ *     tab</span>` accessibility label. The old text-scrape picked that whole
+ *     string up (it passes the name-format validation) and wrote literal
+ *     "Opens Jaipur in new tab" rows into master_city. Fixed by reading the
+ *     city name from the card's own `href` query param (`destination=Jaipur`)
+ *     first, which is always present and never carries this wrapper text.
+ *   - Strategy 3 (mining city/locality names from rendered hotel cards, the
+ *     only signal for states with no destinations module) was resolving the
+ *     wrong heading — `card.querySelector('h3')` matches the hidden "Photo
+ *     gallery for <name>" heading before the real title heading — so it
+ *     never found real locality text and silently fell back to 0 organic
+ *     cities. Fixed by extracting the locality from the hotel-detail URL's
+ *     own slug instead, which reliably starts with the city name
+ *     (`/Bengaluru-Hotels-...`, `/Belagavi-Hotels-...`, `/Somvarpet-Hotels-...`)
+ *     — far more robust than DOM text-mining and needs no heading match at all.
+ * The sidebar's "Popular locations" filter (previously Strategy 2) only
+ * surfaces landmarks/neighbourhoods ("M.G. Road", "Bandipur National Park"),
+ * not city names, so it stays removed — matching those selectors would
+ * silently write landmarks into master_city.
  *
  * Expect to revisit this file again — Expedia changes markup periodically
  * and has active anti-bot measures (rate limiting, potential CAPTCHA
@@ -95,11 +110,30 @@ export const ExpediaSelectors = {
     // is one of these, distinguished only by its own heading text — matched
     // in code via policyText(), not by a per-field selector.
     policyItem: '[data-stid="content-item"]',
+    // "See all about this property" opens a dialog (no navigation — client-side
+    // state only) with two tabs, "Amenities" (category-grouped <li> amenities,
+    // far more complete than the on-page amenitiesHeadingPattern fallback) and
+    // "About" (headline + full description + spoken languages). Verified live
+    // via Playwright MCP on 2026-09-08 against Hyatt Centric MG Road Bangalore
+    // (h1531574) — see hotel-detail.service.ts scrapeAboutDialog().
+    aboutDialogTrigger: 'button[aria-label="See all about this property"]',
+    dialog: '[role="dialog"]',
+    dialogTab: '[role="tab"]',
+    dialogCloseButton: 'button[aria-label*="Close"]',
   },
   rooms: {
     roomCard: '[data-stid="section-room-list"] [data-stid^="property-offer-"]',
     // Room facts (view, size, occupancy, bed type, amenities) are all flat
     // <li> items under one <ul>, categorized heuristically in
     // hotel-detail.service.ts — there is no per-field selector for them.
+    //
+    // Each room card has TWO "More details" buttons: one for the room itself
+    // (class `uitk-link`) and one for a rate "Extras" upsell popup (class
+    // `uitk-more-info-trigger`) — distinguished by class in code, not text,
+    // since both render the same visible label. Clicking the room one opens
+    // `propertyUnitRoomInfoDialog=...` with a categorized "Room amenities"
+    // list (Bathroom/Bedroom/Entertainment/Safety/...) richer than the flat
+    // card-level <li> list. Verified live 2026-09-08, see scrapeRoomInfoDialog().
+    roomInfoMoreDetailsButtonExcludeClass: 'uitk-more-info-trigger',
   },
 } as const;

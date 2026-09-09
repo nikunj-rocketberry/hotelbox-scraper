@@ -111,8 +111,11 @@ export class IngestionService {
     const allNames = canonical.flatMap((c) => c.hotel.amenities);
     const idByName = await this.amenityRepository.batchGetOrCreateHotelAmenityIds(manager, allNames);
 
+    // .slice(0, 150) matches the truncation batchGetOrCreateHotelAmenityIds
+    // applies before keying idByName — without it, a name over varchar(150)
+    // would look itself up by its full (untruncated) form and never match.
     const pairs = canonical.flatMap((c) =>
-      [...new Set(c.hotel.amenities.map((n) => n.trim()).filter(Boolean))]
+      [...new Set(c.hotel.amenities.map((n) => n.trim().slice(0, 150)).filter(Boolean))]
         .map((name) => ({ hotelId: c.hotelId, amenityId: idByName.get(name) }))
         .filter((p): p is { hotelId: string; amenityId: string } => Boolean(p.amenityId)),
     );
@@ -125,7 +128,7 @@ export class IngestionService {
     const idByName = await this.amenityRepository.batchGetOrCreateRoomAmenityIds(manager, allNames);
 
     const pairs = roomItems.flatMap((item, j) =>
-      [...new Set(item.room.amenities.map((n) => n.trim()).filter(Boolean))]
+      [...new Set(item.room.amenities.map((n) => n.trim().slice(0, 150)).filter(Boolean))]
         .map((name) => ({ roomToHotelId: roomToHotelIds[j], amenityId: idByName.get(name) }))
         .filter((p): p is { roomToHotelId: string; amenityId: string } => Boolean(p.amenityId)),
     );

@@ -24,7 +24,8 @@ export interface CityHotelsJob {
 export interface HotelDetailJob {
   countryId: string;
   stateId: string;
-  cityId: string;
+  /** Unset for hotels harvested directly from a state-wide sweep (no destinations module) whose locality didn't match any discovered city. */
+  cityId?: string;
   expediaHotelId: string;
   detailUrl: string;
 }

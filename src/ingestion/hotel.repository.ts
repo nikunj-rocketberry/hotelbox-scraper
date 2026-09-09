@@ -118,11 +118,18 @@ export class HotelRepository {
     await manager.query(
       `INSERT INTO hotel_details (
          hotel_id, headline, short_description, full_description,
-         check_in_time, check_out_time, check_in_instructions, pet_policy
+         check_in_time, check_out_time, check_in_instructions, pet_policy,
+         children_policy, optional_fees, know_before_you_go, spoken_languages, attributes
        )
-       SELECT * FROM UNNEST(
-         $1::bigint[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::text[], $8::text[]
-       )
+       SELECT t.hotel_id, t.headline, t.short_description, t.full_description,
+              t.check_in_time, t.check_out_time, t.check_in_instructions, t.pet_policy,
+              t.children_policy, t.optional_fees, t.know_before_you_go, t.spoken_languages::jsonb, t.attributes::jsonb
+       FROM UNNEST(
+         $1::bigint[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::text[], $8::text[],
+         $9::text[], $10::text[], $11::text[], $12::text[], $13::text[]
+       ) AS t(hotel_id, headline, short_description, full_description,
+              check_in_time, check_out_time, check_in_instructions, pet_policy,
+              children_policy, optional_fees, know_before_you_go, spoken_languages, attributes)
        ON CONFLICT (hotel_id) DO UPDATE SET
          headline = COALESCE(EXCLUDED.headline, hotel_details.headline),
          short_description = COALESCE(EXCLUDED.short_description, hotel_details.short_description),
@@ -131,6 +138,11 @@ export class HotelRepository {
          check_out_time = COALESCE(EXCLUDED.check_out_time, hotel_details.check_out_time),
          check_in_instructions = COALESCE(EXCLUDED.check_in_instructions, hotel_details.check_in_instructions),
          pet_policy = COALESCE(EXCLUDED.pet_policy, hotel_details.pet_policy),
+         children_policy = COALESCE(EXCLUDED.children_policy, hotel_details.children_policy),
+         optional_fees = COALESCE(EXCLUDED.optional_fees, hotel_details.optional_fees),
+         know_before_you_go = COALESCE(EXCLUDED.know_before_you_go, hotel_details.know_before_you_go),
+         spoken_languages = COALESCE(EXCLUDED.spoken_languages, hotel_details.spoken_languages),
+         attributes = COALESCE(EXCLUDED.attributes, hotel_details.attributes),
          updated_at = now()`,
       [
         deduped.map((p) => p.hotelId),
@@ -141,6 +153,15 @@ export class HotelRepository {
         deduped.map((p) => p.hotel.checkOutTime ?? null),
         deduped.map((p) => p.hotel.checkInInstructions ?? null),
         deduped.map((p) => p.hotel.petPolicy ?? null),
+        deduped.map((p) => p.hotel.childrenPolicy ?? null),
+        deduped.map((p) => p.hotel.optionalFees ?? null),
+        deduped.map((p) => p.hotel.knowBeforeYouGo ?? null),
+        deduped.map((p) => (p.hotel.spokenLanguages?.length ? JSON.stringify(p.hotel.spokenLanguages) : null)),
+        deduped.map((p) =>
+          p.hotel.accessibilityNotes || p.hotel.accessibilityFeatures?.length
+            ? JSON.stringify({ accessibility: { notes: p.hotel.accessibilityNotes ?? null, features: p.hotel.accessibilityFeatures ?? [] } })
+            : null,
+        ),
       ],
     );
   }
