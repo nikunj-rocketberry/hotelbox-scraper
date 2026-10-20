@@ -1,6 +1,9 @@
+import { ScrapedHotel, GeoContext } from '../ingestion/types';
+
 export const QUEUE_REGION_DISCOVERY = 'region-discovery';
 export const QUEUE_CITY_HOTELS = 'city-hotels';
 export const QUEUE_HOTEL_DETAIL = 'hotel-detail';
+export const QUEUE_HOTEL_INGEST = 'hotel-ingest';
 
 export interface RegionDiscoveryJob {
   countryId: string;
@@ -28,4 +31,16 @@ export interface HotelDetailJob {
   cityId?: string;
   expediaHotelId: string;
   detailUrl: string;
+}
+
+/**
+ * Hand-off from a finished scrape to ingestion (image upload + DB write).
+ * Deliberately carries the full scraped payload rather than a reference to
+ * it — durably persisted in Redis the moment it's added, so the scraper job
+ * that produced it can complete (and free its Playwright context) without
+ * waiting for MinIO/Postgres at all. See hotel-detail.processor.ts / ingestion.processor.ts.
+ */
+export interface HotelIngestJob {
+  hotel: ScrapedHotel;
+  geo: GeoContext;
 }

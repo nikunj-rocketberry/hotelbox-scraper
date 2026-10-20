@@ -70,10 +70,21 @@ export class AntiBotGuardService implements OnModuleDestroy {
     this.logger.log('Active anti-bot cooldown cleared from Redis.');
   }
 
-  /** Call after every page.goto() with the response status + page content. Returns the detected reason, or null if clean. */
+  /** Call after every page.goto() with the response status + page content. Returns the detected reason, or null if clean. Trips the fleet-wide cooldown on detection. */
   async checkPage(page: Page, responseStatus: number | undefined): Promise<string | null> {
-    if (responseStatus === 429) return this.trip('http-429');
-    if (responseStatus === 403) return this.trip('http-403');
+    const reason = await this.detectBlockReason(page, responseStatus);
+    return reason ? this.trip(reason) : null;
+  }
+
+  /**
+   * Detection only — never touches the cooldown. Split out from checkPage() so
+   * a manual-solve session can keep probing "is this page still challenged?"
+   * while a human works on it, without each probe re-arming the very block it's
+   * trying to clear.
+   */
+  async detectBlockReason(page: Page, responseStatus: number | undefined): Promise<string | null> {
+    if (responseStatus === 429) return 'http-429';
+    if (responseStatus === 403) return 'http-403';
 
     const [title, bodyText] = await Promise.all([
       page.title().catch(() => ''),
@@ -85,9 +96,7 @@ export class AntiBotGuardService implements OnModuleDestroy {
     const haystack = `${title} ${bodyText}`.slice(0, 2000);
 
     for (const { pattern, reason } of BLOCK_SIGNALS) {
-      if (pattern.test(haystack)) {
-        return this.trip(reason);
-      }
+      if (pattern.test(haystack)) return reason;
     }
     return null;
   }

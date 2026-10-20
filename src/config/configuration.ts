@@ -38,6 +38,8 @@ export interface AppConfig {
     userDataDir?: string;
     maxHotelMediaCount: number;
     maxRoomMediaCount: number;
+    manualSolveEnabled: boolean;
+    manualSolveTimeoutMs: number;
   };
   worker: {
     concurrency: number;
@@ -49,6 +51,11 @@ export interface AppConfig {
   ingest: {
     batchSize: number;
     maxWaitMs: number;
+    uploadConcurrency: number;
+    workerConcurrency: number;
+    backpressureThreshold: number;
+    jobAttempts: number;
+    backoffBaseMs: number;
   };
   antiBot: {
     cooldownMs: number;
@@ -101,6 +108,10 @@ export default (): AppConfig => ({
     userDataDir: process.env.BROWSER_USER_DATA_DIR || undefined,
     maxHotelMediaCount: num(process.env.HOTEL_MAX_MEDIA_COUNT, 10),
     maxRoomMediaCount: num(process.env.ROOM_MAX_MEDIA_COUNT, 3),
+    // Opens one headed Chrome window on demand for a human to clear a CAPTCHA/challenge.
+    // Disable on headless servers/CI (no display) to fall back to the plain cooldown wait.
+    manualSolveEnabled: bool(process.env.MANUAL_SOLVE_ENABLED, true),
+    manualSolveTimeoutMs: num(process.env.MANUAL_SOLVE_TIMEOUT_MS, 10 * 60 * 1000),
   },
   worker: {
     concurrency: num(process.env.WORKER_CONCURRENCY, 5),
@@ -112,6 +123,16 @@ export default (): AppConfig => ({
   ingest: {
     batchSize: num(process.env.INGEST_BATCH_SIZE, 20),
     maxWaitMs: num(process.env.INGEST_BATCH_MAX_WAIT_MS, 4000),
+    // Global bounded pool size for image uploads across a WHOLE batch (hotel + room photos together) — not per-hotel.
+    uploadConcurrency: num(process.env.INGEST_UPLOAD_CONCURRENCY, 20),
+    // Ingestion worker's own BullMQ concurrency — must be >= batchSize, or batches can never fill via the size trigger
+    // (only enough concurrent ingest jobs would be in flight to ever reach it), always falling back to the slower timer flush.
+    workerConcurrency: num(process.env.INGEST_WORKER_CONCURRENCY, 20),
+    // If the ingest queue backs up past this many waiting jobs, scraper workers pause picking up new hotels
+    // rather than keep scraping into an ever-growing backlog.
+    backpressureThreshold: num(process.env.INGEST_BACKPRESSURE_THRESHOLD, 300),
+    jobAttempts: num(process.env.INGEST_JOB_ATTEMPTS, 5),
+    backoffBaseMs: num(process.env.INGEST_JOB_BACKOFF_BASE_MS, 5000),
   },
   antiBot: {
     cooldownMs: num(process.env.ANTI_BOT_COOLDOWN_MS, 30 * 60 * 1000),

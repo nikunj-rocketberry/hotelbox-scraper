@@ -8,6 +8,11 @@ import { MediaRepository } from './media.repository';
 import { IngestionService } from './ingestion.service';
 import { BatchIngestionService } from './batch-ingestion.service';
 
+/**
+ * Repositories + ingestion services only. The queue CONSUMER lives in
+ * IngestionWorkerModule so the scraper process can use these repositories
+ * (freshness lookups, geo) without also running the ingestion worker.
+ */
 @Module({
   imports: [StorageModule],
   providers: [GeoRepository, HotelRepository, RoomRepository, AmenityRepository, MediaRepository, IngestionService, BatchIngestionService],

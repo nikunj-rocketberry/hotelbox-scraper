@@ -43,3 +43,25 @@ export function dedupeKeepLast<T>(items: T[], keyFn: (item: T) => string): Dedup
 export function normalizeKey(value: string): string {
   return value.trim().toLowerCase();
 }
+
+/**
+ * Runs `tasks` under a shared bounded worker pool of size `limit` — each of
+ * `limit` workers pulls the next unclaimed task as soon as it finishes its
+ * current one, so the pool stays saturated instead of stepping through fixed
+ * chunks (a straggler in one chunk no longer stalls everything behind it).
+ * One caller's failure doesn't stop the rest — each task is responsible for
+ * catching its own errors if a partial failure shouldn't abort the batch.
+ */
+export async function runWithConcurrency(tasks: Array<() => Promise<void>>, limit: number): Promise<void> {
+  if (tasks.length === 0) return;
+  const poolSize = Math.max(1, Math.min(limit, tasks.length));
+  let next = 0;
+
+  await Promise.all(
+    Array.from({ length: poolSize }, async () => {
+      for (let i = next++; i < tasks.length; i = next++) {
+        await tasks[i]();
+      }
+    }),
+  );
+}

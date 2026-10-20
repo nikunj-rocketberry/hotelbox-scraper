@@ -39,6 +39,16 @@ async function attrOf(page: Page, selector: string, name: string): Promise<strin
   return value ?? undefined;
 }
 
+/**
+ * Last-resort name when the title selector, the bare <h1> and schema.org JSON-LD
+ * ALL came back empty — which in practice means the page never rendered its real
+ * content (soft block, dead render, layout change), not that we found a nameless
+ * hotel. HotelDetailProcessor treats this as a failed scrape and lets BullMQ
+ * retry rather than committing an empty row, so exported here to keep the two
+ * sides from drifting apart.
+ */
+export const UNKNOWN_HOTEL_NAME = 'Unknown Hotel';
+
 /** Prefers the largest `srcset` candidate over `src`/`data-src`, which are frequently a thumbnail-sized placeholder. */
 async function bestImageUrl(img: ElementHandle<SVGElement | HTMLElement>): Promise<string | undefined> {
   const srcset = (await img.getAttribute('srcset').catch(() => null)) ?? (await img.getAttribute('data-srcset').catch(() => null));
@@ -137,8 +147,24 @@ export class HotelDetailService {
       const page = await context.newPage();
       try {
         await this.browser.safeGoto(page, detailUrl);
-        await page.waitForSelector(ExpediaSelectors.hotelDetail.name, { timeout: 15_000 }).catch(() => {
-          this.logger.warn(`Hotel title selector not found for ${detailUrl} — page structure may have changed`);
+        await page.waitForSelector(ExpediaSelectors.hotelDetail.name, { timeout: 25_000 }).catch(async () => {
+          // Diagnostic only — tells us whether this is a genuinely slow page
+          // (real content, just late) or a silently degraded/soft-blocked
+          // response (checkPage()'s text-regex block detection can miss a
+          // response that withholds content without showing an actual
+          // "captcha"/"robot check" string).
+          const [title, bodySnippet] = await Promise.all([
+            page.title().catch(() => '<title read failed>'),
+            page
+              .locator('body')
+              .innerText({ timeout: 2000 })
+              .then((t) => t.slice(0, 300))
+              .catch(() => '<body read failed>'),
+          ]);
+          this.logger.warn(
+            `Hotel title selector not found for ${detailUrl} — page structure may have changed. ` +
+              `Page title: "${title}" | Body snippet: "${bodySnippet.replace(/\s+/g, ' ')}"`,
+          );
         });
 
         // Rooms, the amenities section and (on some templates) the review
@@ -155,7 +181,7 @@ export class HotelDetailService {
         // found, everything below just falls back to its previous source.
         const aboutDialog = await this.scrapeAboutDialog(page);
 
-        const name = (await textOf(page, ExpediaSelectors.hotelDetail.name)) ?? (await textOf(page, 'h1')) ?? jsonLd?.name ?? 'Unknown Hotel';
+        const name = (await textOf(page, ExpediaSelectors.hotelDetail.name)) ?? (await textOf(page, 'h1')) ?? jsonLd?.name ?? UNKNOWN_HOTEL_NAME;
 
         // Star class is only exposed as visually-hidden text ("Property class: 5
         // and above") inside the title block — there's no dedicated badge element.
@@ -465,10 +491,20 @@ export class HotelDetailService {
       // The gallery dialog lazy-loads more images as it's scrolled — keep
       // nudging its last image into view until the count stops growing
       // (bounded to 15 rounds so a dialog that never settles can't hang the job).
+      //
+      // Also stop as soon as enough images are loaded to satisfy
+      // maxHotelMediaCount: the return below slices to that count anyway, so
+      // scrolling a 100-photo gallery to keep 10 of them was ~6s of pure waste
+      // per hotel. Scales with the config — raise HOTEL_MAX_MEDIA_COUNT and
+      // this keeps scrolling for longer to collect the larger set. The margin
+      // covers URLs that collapse in the dedupe below (same photo at two
+      // srcset sizes), so the slice still has enough candidates to fill.
+      const enoughImages = this.maxHotelMediaCount + 5;
       let previousCount = -1;
       for (let round = 0; round < 15; round++) {
         const loaded = await page.$$(ExpediaSelectors.hotelDetail.galleryImage);
         if (loaded.length === 0 || loaded.length === previousCount) break;
+        if (loaded.length >= enoughImages) break;
         previousCount = loaded.length;
         await loaded[loaded.length - 1].scrollIntoViewIfNeeded().catch(() => undefined);
         await page.waitForTimeout(400);

@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client } from 'minio';
-import { randomUUID } from 'crypto';
+import { createHash } from 'crypto';
 import { AppConfig } from '../config/configuration';
 
 @Injectable()
@@ -57,6 +57,14 @@ export class StorageService implements OnModuleInit {
   /**
    * Downloads an image from Expedia's CDN and re-uploads it to MinIO.
    * Never store binary in Postgres — only the returned url/key.
+   *
+   * The key is derived from the source URL rather than a random UUID so the
+   * same photo always lands on the same object. That makes re-uploads
+   * idempotent: an ingest batch that uploads images and then fails its DB
+   * transaction gets retried, and the retry overwrites those same objects
+   * instead of orphaning the first attempt's copies in the bucket forever.
+   * Objects written before this change keep their old UUID keys and stay
+   * valid — the rows pointing at them are untouched.
    */
   async uploadFromUrl(sourceUrl: string, keyPrefix: string): Promise<{ url: string; key: string }> {
     const response = await fetch(sourceUrl);
@@ -66,7 +74,8 @@ export class StorageService implements OnModuleInit {
     const buffer = Buffer.from(await response.arrayBuffer());
     const contentType = response.headers.get('content-type') ?? 'image/jpeg';
     const extension = contentType.split('/')[1]?.split(';')[0] ?? 'jpg';
-    const key = `${keyPrefix}-${randomUUID()}.${extension}`;
+    const sourceHash = createHash('sha1').update(sourceUrl).digest('hex').slice(0, 16);
+    const key = `${keyPrefix}-${sourceHash}.${extension}`;
 
     await this.client.putObject(this.bucket, key, buffer, buffer.length, { 'Content-Type': contentType });
 

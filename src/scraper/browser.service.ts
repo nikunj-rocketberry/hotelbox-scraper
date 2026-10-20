@@ -17,6 +17,16 @@ const MAX_USES_PER_CONTEXT = 100;
  */
 const BLOCKED_RESOURCE_TYPES = new Set(['media']);
 
+/**
+ * Akamai Bot Manager's own trust cookies — the ONLY state we copy from the
+ * manual-solve browser into the live pool. Deliberately narrow: syncing a
+ * human's full cookie jar/localStorage into every pooled context would merge
+ * 15 independent sessions into one, which is exactly the correlated-activity
+ * signal the per-context pool exists to avoid. We just want the verified
+ * "not a bot" token to propagate, nothing else about that session.
+ */
+const AKAMAI_TRUST_COOKIE_NAMES = new Set(['_abck', 'bm_sz', 'ak_bmsc', 'bm_sv', 'bm_mi']);
+
 interface PooledContext {
   context: BrowserContext;
   uses: number;
@@ -144,6 +154,22 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
   private readonly waiters: Array<(pooled: PooledContext) => void> = [];
   private outstanding = 0;
 
+  // Every context currently alive in the pool, idle AND checked out by a job —
+  // so a manual CAPTCHA solve can push the fresh trust cookie into all of
+  // them, not just the ones sitting idle at that moment.
+  private readonly liveContexts = new Set<BrowserContext>();
+
+  private readonly manualSolveEnabled: boolean;
+  private readonly manualSolveTimeoutMs: number;
+  /** Keeps concurrent saveContextState() temp filenames from colliding within this process. */
+  private stateWriteCounter = 0;
+  /** Serializes cold-start warmups — see warmUpSerialized(). */
+  private warmupPromise: Promise<void> | null = null;
+  // In-process lock: if several contexts hit the block around the same time,
+  // they all join the one solver session already in flight instead of each
+  // popping open their own headed window.
+  private solverPromise: Promise<void> | null = null;
+
   constructor(
     private readonly config: ConfigService<AppConfig, true>,
     private readonly antiBotGuard: AntiBotGuardService,
@@ -155,15 +181,25 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
       config.get('scraper.navJitterMinMs', { infer: true }),
       config.get('scraper.navJitterMaxMs', { infer: true }),
     ];
+    this.manualSolveEnabled = config.get('scraper.manualSolveEnabled', { infer: true });
+    this.manualSolveTimeoutMs = config.get('scraper.manualSolveTimeoutMs', { infer: true });
   }
 
   async onModuleInit(): Promise<void> {
-    this.browser = await this.launch();
+    // Must go through getConnectedBrowser() rather than calling launch()
+    // directly: BullMQ starts pulling jobs immediately, and a job that reaches
+    // getConnectedBrowser() before this first launch resolves would see both
+    // `browser` and `launching` unset and start a SECOND Chrome — orphaning one
+    // of them for the lifetime of the process (onModuleDestroy only closes
+    // `this.browser`). Routing both paths through the same promise makes
+    // concurrent callers join the launch already in flight.
+    await this.getConnectedBrowser();
   }
 
   async onModuleDestroy(): Promise<void> {
     await Promise.all(this.idle.map((p) => p.context.close().catch(() => undefined)));
     this.idle.length = 0;
+    this.liveContexts.clear();
     await this.browser?.close().catch(() => undefined);
   }
 
@@ -180,7 +216,14 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
     const free = this.idle.pop();
     if (free) return free;
 
-    if (this.outstanding < this.maxContexts) {
+    // Two guards, because `outstanding` alone can drift: a browser crash
+    // relaunches via getConnectedBrowser() (which zeroes the counter) WHILE the
+    // release() calls for every context that died are still decrementing it.
+    // `liveContexts` is ground truth for contexts that actually exist, so it
+    // catches a counter that drifted low; `outstanding` covers what that set
+    // can't see — creations still in flight, reserved synchronously here before
+    // the await, so N concurrent acquires can't all race past the cap.
+    if (this.outstanding < this.maxContexts && this.liveContexts.size < this.maxContexts) {
       this.outstanding++;
       return { context: await this.createContext(), uses: 0 };
     }
@@ -198,7 +241,11 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
     } else {
       await this.saveContextState(pooled.context).catch(() => undefined);
       await pooled.context.close().catch(() => undefined);
-      this.outstanding--;
+      this.liveContexts.delete(pooled.context);
+      // Floor at 0: after a crash-triggered relaunch zeroes this counter, the
+      // in-flight release() calls for the dead contexts still land here, and a
+      // negative count would let acquire() create well past maxContexts.
+      this.outstanding = Math.max(0, this.outstanding - 1);
     }
 
     const waiter = this.waiters.shift();
@@ -215,9 +262,7 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  private async createContext(): Promise<BrowserContext> {
-    const browser = await this.getConnectedBrowser();
-
+  private buildContextOptions(): Record<string, unknown> {
     const stateFile = this.getStorageStatePath();
     const hasState = stateFile && fs.existsSync(stateFile);
 
@@ -237,14 +282,31 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
 
     if (hasState) {
       try {
-        contextOptions.storageState = stateFile;
+        // Seed from the parsed object rather than the path so a CHALLENGED
+        // _abck (`~-1~`) can be stripped first. Carrying one forward hands every
+        // new context a token Akamai has already flagged; dropping it lets the
+        // first request mint a clean one. Everything else in the session is kept.
+        const state = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+        if (Array.isArray(state.cookies)) {
+          const before = state.cookies.length;
+          state.cookies = state.cookies.filter((c: { name?: string; value?: string }) => !(c.name === '_abck' && !String(c.value ?? '').includes('~0~')));
+          if (state.cookies.length < before) {
+            this.logger.warn('Dropped an untrusted _abck from persisted state — new context will get a fresh token.');
+          }
+        }
+        contextOptions.storageState = state;
         this.logger.log(`Restored persistent browser session state from ${stateFile}`);
       } catch (err) {
         this.logger.warn(`Could not read storage state from ${stateFile}: ${(err as Error).message}`);
       }
     }
 
-    const context = await browser.newContext(contextOptions);
+    return contextOptions;
+  }
+
+  private async createContext(): Promise<BrowserContext> {
+    const browser = await this.getConnectedBrowser();
+    const context = await browser.newContext(this.buildContextOptions());
     await context.addInitScript(STEALTH_INIT_SCRIPT);
 
     if (this.blockNonEssentialResources) {
@@ -254,6 +316,7 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
       });
     }
 
+    this.liveContexts.add(context);
     return context;
   }
 
@@ -276,7 +339,7 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
     const isProtectedTarget = url.includes('/Hotel-Search') || url.includes('.Hotel-Information');
 
     if ((!hasTrustedCookie || cookies.length === 0) && isProtectedTarget) {
-      await this.warmUpSession(page, baseUrl, timeoutMs);
+      await this.warmUpSerialized(page, baseUrl, timeoutMs);
     }
 
     this.logger.log(`Navigating to target: ${url}`);
@@ -290,7 +353,9 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
     // If a 429 occurs on the target, attempt one active re-warmup and single retry before failing
     if (response?.status() === 429) {
       this.logger.warn(`Target responded with 429 — executing active human telemetry re-warmup before retry...`);
-      await this.warmUpSession(page, baseUrl, timeoutMs);
+      // Serialized too: a 429 typically hits several contexts at once, and N
+      // simultaneous re-warmups is the same burst that caused it.
+      await this.warmUpSerialized(page, baseUrl, timeoutMs);
       await this.jitterDelay();
       response = await page.goto(url, {
         waitUntil: 'domcontentloaded',
@@ -302,11 +367,210 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
 
     const blockReason = await this.antiBotGuard.checkPage(page, response?.status());
     if (blockReason) {
+      if (this.manualSolveEnabled) {
+        await this.resolveBlockManually(url).catch((err) =>
+          this.logger.error(`Manual solve attempt failed: ${(err as Error).message}`),
+        );
+      }
       throw new Error(`Blocked by Expedia anti-bot (${blockReason}) while loading ${url}`);
     }
 
     // Persist verified session cookies to disk
     await this.saveContextState(page.context()).catch(() => undefined);
+  }
+
+  /**
+   * Opens one headed Chrome window so a human can clear a CAPTCHA/challenge,
+   * then propagates just the Akamai trust cookies (never the full session —
+   * see AKAMAI_TRUST_COOKIE_NAMES) into every live pooled context so the
+   * whole headless fleet resumes without each of them re-triggering their
+   * own challenge. The fleet-wide Redis cooldown (AntiBotGuardService) is
+   * already pausing every other worker while this runs.
+   *
+   * In-process only: whichever worker hits the block first opens the window;
+   * concurrent callers just await the same in-flight solve.
+   */
+  private async resolveBlockManually(url: string): Promise<void> {
+    if (this.solverPromise) {
+      return this.solverPromise;
+    }
+    this.solverPromise = this.runManualSolve(url).finally(() => {
+      this.solverPromise = null;
+    });
+    return this.solverPromise;
+  }
+
+  private async runManualSolve(url: string): Promise<void> {
+    this.logger.warn(`Anti-bot challenge hit — opening a headed Chrome window for manual solve: ${url}`);
+
+    let solverBrowser: Browser;
+    try {
+      solverBrowser = await this.launch(false);
+    } catch (err) {
+      this.logger.error(`Could not launch headed solver browser (no display available?): ${(err as Error).message}`);
+      return;
+    }
+
+    try {
+      const context = await solverBrowser.newContext(this.buildContextOptions());
+      await context.addInitScript(STEALTH_INIT_SCRIPT);
+      const page = await context.newPage();
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60_000 }).catch((err) => {
+        this.logger.warn(`Solver window navigation notice: ${(err as Error).message}`);
+      });
+
+      this.logger.warn(
+        `>>> Please solve the CAPTCHA/challenge in the opened Chrome window. Waiting up to ${Math.round(this.manualSolveTimeoutMs / 1000)}s...`,
+      );
+
+      const verified = await this.waitForManualSolve(context, page, url);
+      if (!verified) {
+        this.logger.warn('Manual solve did not verify (timed out, or the window was closed before the challenge cleared) — falling back to the normal cooldown wait.');
+        return;
+      }
+
+      this.logger.log('Manual verification confirmed — propagating trust to the headless pool.');
+      await this.saveContextState(context, { force: true }).catch(() => undefined);
+      await this.syncAkamaiTrust(context);
+      await this.antiBotGuard.clearBlock();
+    } finally {
+      await solverBrowser.close().catch(() => undefined);
+    }
+  }
+
+  /**
+   * Waits for a human to clear the challenge in the headed window.
+   *
+   * Does NOT rely solely on `_abck` flipping to ~0~: Akamai generally only
+   * upgrades that cookie on a SUBSEQUENT request, so a solved challenge sitting
+   * on a static page can leave it at ~-1~ indefinitely — which previously meant
+   * the solve was never detected, the window hung open for the full timeout, and
+   * the fleet cooldown was never cleared.
+   *
+   * So the real success signal is the one we actually care about: can this
+   * session load the target page again? The cookie is kept only as a fast path.
+   *
+   * While waiting, the fleet-wide cooldown is deliberately kept fresh — its own
+   * TTL is shorter than the solve timeout, so without this the other workers
+   * would come charging back mid-solve and re-trip the block.
+   */
+  private async waitForManualSolve(context: BrowserContext, page: Page, targetUrl: string): Promise<boolean> {
+    const deadline = Date.now() + this.manualSolveTimeoutMs;
+    let lastCooldownRefresh = 0;
+    let lastProbe = Date.now(); // the initial goto just happened; don't re-probe immediately
+
+    while (Date.now() < deadline) {
+      // Keep other workers parked while the human works, well inside the cooldown's own TTL.
+      if (Date.now() - lastCooldownRefresh > 60_000) {
+        await this.antiBotGuard.reportBlock('manual-solve-in-progress').catch(() => undefined);
+        lastCooldownRefresh = Date.now();
+      }
+
+      if (page.isClosed()) {
+        // Human closed the window — verify on a fresh page rather than assuming
+        // either outcome, since the context (and its cookies) outlives the page.
+        this.logger.log('Solver window closed — verifying whether the session works now.');
+        return this.confirmSessionWorks(context, targetUrl);
+      }
+
+      const cookies = await context.cookies().catch(() => [] as Awaited<ReturnType<BrowserContext['cookies']>>);
+      if (cookies.some((c) => c.name === '_abck' && c.value.includes('~0~'))) {
+        this.logger.log('Akamai trust cookie observed in solver window.');
+        return true;
+      }
+
+      // Challenge visibly gone from the window? Confirm with a real navigation.
+      // Throttled: a challenge page whose wording doesn't match BLOCK_SIGNALS
+      // would otherwise look "clear" and have us probing Expedia every few
+      // seconds while the human is still working — more traffic during a block,
+      // which is exactly the wrong thing to do.
+      const stillBlocked = await this.antiBotGuard.detectBlockReason(page, undefined).catch(() => null);
+      if (!stillBlocked && Date.now() - lastProbe > 20_000) {
+        lastProbe = Date.now();
+        if (await this.confirmSessionWorks(context, targetUrl)) return true;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
+
+    return false;
+  }
+
+  /** Ground truth for "is this session usable again": load the target on a throwaway page and see if it comes back clean. */
+  private async confirmSessionWorks(context: BrowserContext, targetUrl: string): Promise<boolean> {
+    const probe = await context.newPage().catch(() => null);
+    if (!probe) return false;
+    try {
+      const response = await probe.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 45_000 }).catch(() => null);
+      if (!response || response.status() >= 400) return false;
+      const reason = await this.antiBotGuard.detectBlockReason(probe, response.status()).catch(() => 'probe-failed');
+      return !reason;
+    } finally {
+      await probe.close().catch(() => undefined);
+    }
+  }
+
+  /** Copies ONLY Akamai's own trust cookies into every live context — see AKAMAI_TRUST_COOKIE_NAMES. */
+  private async syncAkamaiTrust(solvedContext: BrowserContext): Promise<void> {
+    const cookies = await solvedContext.cookies();
+    const trustCookies = cookies.filter((c) => AKAMAI_TRUST_COOKIE_NAMES.has(c.name));
+    if (trustCookies.length === 0) return;
+
+    await Promise.all(
+      [...this.liveContexts].map((ctx) =>
+        ctx.addCookies(trustCookies).catch((err) =>
+          this.logger.warn(`Failed to sync trust cookie into a pooled context: ${(err as Error).message}`),
+        ),
+      ),
+    );
+    this.logger.log(`Synced ${trustCookies.length} Akamai trust cookie(s) into ${this.liveContexts.size} live context(s).`);
+  }
+
+  /** True when this context already holds a validated Akamai token. */
+  private async contextHasTrust(context: BrowserContext): Promise<boolean> {
+    const cookies = await context.cookies().catch(() => [] as Awaited<ReturnType<BrowserContext['cookies']>>);
+    return cookies.some((c) => c.name === '_abck' && c.value.includes('~0~'));
+  }
+
+  /**
+   * Warmup, but never more than one at a time across the whole pool.
+   *
+   * On a cold start every pooled context lacks a trusted token, so all of them
+   * used to run warmUpSession() simultaneously — N unthrottled homepage hits in
+   * the same instant (these don't draw a traffic-shaper token; only the target
+   * navigation does). Observed live: that burst alone returns 429 and blocks the
+   * fleet before it has scraped anything.
+   *
+   * Now the first caller does the handshake and, if it earns trust, propagates
+   * it to every live context; the rest wake up already trusted and skip warmup
+   * entirely — one homepage hit instead of N. If that handshake didn't earn
+   * trust, the waiters fall through and take their turn one after another, so
+   * the worst case is staggered rather than simultaneous.
+   */
+  private async warmUpSerialized(page: Page, baseUrl: string, timeoutMs: number): Promise<void> {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const inFlight = this.warmupPromise;
+      if (inFlight) {
+        await inFlight.catch(() => undefined);
+        if (await this.contextHasTrust(page.context())) return;
+        continue; // that warmup didn't get us trust — take our own turn
+      }
+
+      // No await between reading warmupPromise above and assigning it here, so
+      // concurrent callers can't both start a warmup.
+      const run = this.warmUpSession(page, baseUrl, timeoutMs)
+        .then(async () => {
+          if (await this.contextHasTrust(page.context())) {
+            await this.syncAkamaiTrust(page.context());
+          }
+        })
+        .finally(() => {
+          this.warmupPromise = null;
+        });
+      this.warmupPromise = run;
+      await run.catch(() => undefined);
+      return;
+    }
   }
 
   /**
@@ -382,16 +646,42 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  private async saveContextState(context: BrowserContext): Promise<void> {
+  /**
+   * Persists a context's session to the ONE shared state file that seeds every
+   * newly created context. Two guards, because every context in the pool writes
+   * to this same path concurrently:
+   *
+   *  - Only write when this context actually holds a verified Akamai token.
+   *    Previously any context could save, so an untrusted one could overwrite
+   *    the hard-won trusted session (including one a human just solved a CAPTCHA
+   *    for) with a worse one, and every context created afterwards inherited the
+   *    downgrade.
+   *  - Write to a temp file and rename it into place, so a reader creating a
+   *    context never sees a half-written file if another context is mid-save.
+   */
+  private async saveContextState(context: BrowserContext, opts?: { force?: boolean }): Promise<void> {
     const stateFile = this.getStorageStatePath();
     if (!stateFile) return;
+
+    // `force` is for the manual-solve path: a human just proved the session
+    // loads pages again, which is stronger evidence than the cookie shape —
+    // and Akamai may not have upgraded _abck to ~0~ yet at that moment.
+    if (!opts?.force) {
+      const cookies = await context.cookies().catch(() => [] as Awaited<ReturnType<BrowserContext['cookies']>>);
+      const hasTrustedCookie = cookies.some((c) => c.name === '_abck' && c.value.includes('~0~'));
+      if (!hasTrustedCookie) return;
+    }
+
+    const tempFile = `${stateFile}.${process.pid}.${this.stateWriteCounter++}.tmp`;
     try {
       const dir = path.dirname(stateFile);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      await context.storageState({ path: stateFile });
+      await context.storageState({ path: tempFile });
+      await fs.promises.rename(tempFile, stateFile);
     } catch (err) {
+      await fs.promises.unlink(tempFile).catch(() => undefined);
       this.logger.warn(`Failed to persist browser state to ${stateFile}: ${(err as Error).message}`);
     }
   }
@@ -413,20 +703,28 @@ export class BrowserService implements OnModuleInit, OnModuleDestroy {
     if (this.browser?.isConnected()) return this.browser;
     if (this.launching) return this.launching;
 
-    this.logger.warn('Chromium disconnected — relaunching');
-    this.idle.length = 0;
-    this.outstanding = 0;
+    // Only a browser we HAD and lost is a relaunch — the very first launch
+    // (from onModuleInit) has no pool state to discard and isn't a crash.
+    if (this.browser) {
+      this.logger.warn('Chromium disconnected — relaunching');
+      this.idle.length = 0;
+      this.outstanding = 0;
+      this.liveContexts.clear();
+    }
 
     this.launching = this.launch();
-    this.browser = await this.launching;
-    this.launching = undefined;
+    try {
+      this.browser = await this.launching;
+    } finally {
+      this.launching = undefined;
+    }
     return this.browser;
   }
 
-  private async launch(): Promise<Browser> {
+  private async launch(headless = this.config.get('scraper.headless', { infer: true })): Promise<Browser> {
     const launchOptions = {
       channel: 'chrome',
-      headless: this.config.get('scraper.headless', { infer: true }),
+      headless,
       args: [
         '--disable-blink-features=AutomationControlled',
         '--disable-features=IsolateOrigins,site-per-process',

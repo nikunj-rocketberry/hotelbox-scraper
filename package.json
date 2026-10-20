@@ -10,6 +10,8 @@
     "start:api": "node dist/main.js",
     "start:worker": "node dist/worker.main.js",
     "start:worker:dev": "nest start --watch --entryFile worker.main",
+    "start:ingest": "node dist/ingest.main.js",
+    "start:ingest:dev": "nest start --watch --entryFile ingest.main",
     "playwright:install": "playwright install chromium --with-deps",
     "playwright:inspect": "ts-node -r tsconfig-paths/register scripts/inspect.ts",
     "typeorm": "typeorm-ts-node-commonjs",

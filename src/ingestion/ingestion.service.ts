@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { DataSource, EntityManager } from 'typeorm';
 import { HotelRepository, HotelBatchItem } from './hotel.repository';
 import { RoomRepository, RoomBatchItem } from './room.repository';
@@ -6,7 +7,8 @@ import { AmenityRepository } from './amenity.repository';
 import { MediaRepository, FlatHotelMediaRow, FlatRoomMediaRow, UploadedMediaRow } from './media.repository';
 import { ScrapedHotel } from './types';
 import { StorageService } from '../storage/storage.service';
-import { dedupeKeepLast } from './batch.util';
+import { dedupeKeepLast, runWithConcurrency } from './batch.util';
+import { AppConfig } from '../config/configuration';
 
 /**
  * Batch ingestion for N hotels at once (N = whatever BatchIngestionService
@@ -31,6 +33,7 @@ import { dedupeKeepLast } from './batch.util';
 @Injectable()
 export class IngestionService {
   private readonly logger = new Logger(IngestionService.name);
+  private readonly uploadConcurrency: number;
 
   constructor(
     private readonly dataSource: DataSource,
@@ -39,7 +42,10 @@ export class IngestionService {
     private readonly amenityRepository: AmenityRepository,
     private readonly mediaRepository: MediaRepository,
     private readonly storageService: StorageService,
-  ) {}
+    config: ConfigService<AppConfig, true>,
+  ) {
+    this.uploadConcurrency = config.get('ingest.uploadConcurrency', { infer: true });
+  }
 
   async saveHotelsBatch(items: HotelBatchItem[]): Promise<string[]> {
     if (items.length === 0) return [];
@@ -57,22 +63,12 @@ export class IngestionService {
       (p) => p.hotelId,
     );
 
-    const hotelMediaRows: FlatHotelMediaRow[] = [];
-    for (const { hotelId, hotel } of canonical) {
-      const uploaded = await this.uploadMediaBatch(hotel.media, `hotels/${hotelId}`);
-      uploaded.forEach((row, idx) => hotelMediaRows.push({ ...row, hotelId, sortOrder: idx, isPrimary: idx === 0 }));
-    }
-
     const roomItems: RoomBatchItem[] = [];
     canonical.forEach(({ hotelId, hotel }) => {
       hotel.rooms.forEach((room) => roomItems.push({ hotelId, room }));
     });
 
-    const roomUploadedMedia: UploadedMediaRow[][] = [];
-    for (let j = 0; j < roomItems.length; j++) {
-      const { hotelId, room } = roomItems[j];
-      roomUploadedMedia.push(await this.uploadMediaBatch(room.media, `hotels/${hotelId}/rooms/${j}`));
-    }
+    const { hotelMediaRows, roomUploadedMedia } = await this.uploadAllMedia(canonical, roomItems);
 
     const canonicalHotelIds = canonical.map((c) => c.hotelId);
 
@@ -136,35 +132,68 @@ export class IngestionService {
     await this.amenityRepository.batchReplaceRoomAmenities(manager, pairs, roomToHotelIds);
   }
 
-  private async uploadMediaBatch(media: ScrapedHotel['media'], keyPrefix: string): Promise<UploadedMediaRow[]> {
-    const uploaded: UploadedMediaRow[] = [];
-    const concurrency = 4;
-    for (let i = 0; i < media.length; i += concurrency) {
-      const chunk = media.slice(i, i + concurrency);
-      const results = await Promise.all(
-        chunk.map(async (item, chunkIdx) => {
-          const index = i + chunkIdx;
-          try {
-            const { url: mediaUrl, key: s3Key } = await this.storageService.uploadFromUrl(item.url, `${keyPrefix}/${index}`);
-            return {
-              mediaUrl,
-              s3Key,
-              sourceUrl: item.url,
-              category: item.category,
-              caption: item.caption,
-              width: item.width,
-              height: item.height,
-            };
-          } catch (err) {
-            this.logger.warn(`Skipping media ${item.url}: ${(err as Error).message}`);
-            return null;
-          }
-        }),
-      );
-      for (const res of results) {
-        if (res) uploaded.push(res);
+  /**
+   * Uploads every hotel photo AND every room photo across the WHOLE batch
+   * through one shared bounded worker pool, instead of looping hotel-by-hotel
+   * / room-by-room and awaiting each one's uploads before starting the next.
+   * That old sequential shape meant a batch of 20 hotels (~500 images) did
+   * ~120 awaited round trips back-to-back — tens of seconds to minutes with
+   * every job feeding this batch blocked the whole time. One shared pool
+   * keeps `uploadConcurrency` uploads in flight across the entire batch at
+   * once, so wall-clock time is ~(total images / uploadConcurrency) instead
+   * of O(hotels + rooms) round trips.
+   *
+   * Results are written into pre-sized per-hotel/per-room slots (indexed by
+   * each photo's original position), not pushed in completion order — pool
+   * workers finish out of order, and sortOrder/isPrimary must still reflect
+   * each hotel's/room's own original photo order.
+   */
+  private async uploadAllMedia(
+    canonical: Array<{ hotelId: string; hotel: ScrapedHotel }>,
+    roomItems: RoomBatchItem[],
+  ): Promise<{ hotelMediaRows: FlatHotelMediaRow[]; roomUploadedMedia: UploadedMediaRow[][] }> {
+    const hotelSlots: Array<Array<UploadedMediaRow | null>> = canonical.map((c) => new Array(c.hotel.media.length).fill(null));
+    const roomSlots: Array<Array<UploadedMediaRow | null>> = roomItems.map((r) => new Array(r.room.media.length).fill(null));
+
+    const uploadOne = async (item: ScrapedHotel['media'][number], keyPrefix: string): Promise<UploadedMediaRow | null> => {
+      try {
+        const { url: mediaUrl, key: s3Key } = await this.storageService.uploadFromUrl(item.url, keyPrefix);
+        return { mediaUrl, s3Key, sourceUrl: item.url, category: item.category, caption: item.caption, width: item.width, height: item.height };
+      } catch (err) {
+        this.logger.warn(`Skipping media ${item.url}: ${(err as Error).message}`);
+        return null;
       }
-    }
-    return uploaded;
+    };
+
+    const tasks: Array<() => Promise<void>> = [];
+
+    canonical.forEach(({ hotelId, hotel }, hIdx) => {
+      hotel.media.forEach((item, mIdx) => {
+        tasks.push(async () => {
+          hotelSlots[hIdx][mIdx] = await uploadOne(item, `hotels/${hotelId}/${mIdx}`);
+        });
+      });
+    });
+
+    roomItems.forEach(({ hotelId, room }, rIdx) => {
+      room.media.forEach((item, mIdx) => {
+        tasks.push(async () => {
+          roomSlots[rIdx][mIdx] = await uploadOne(item, `hotels/${hotelId}/rooms/${rIdx}/${mIdx}`);
+        });
+      });
+    });
+
+    await runWithConcurrency(tasks, this.uploadConcurrency);
+
+    const hotelMediaRows: FlatHotelMediaRow[] = [];
+    canonical.forEach(({ hotelId }, hIdx) => {
+      hotelSlots[hIdx]
+        .filter((row): row is UploadedMediaRow => row !== null)
+        .forEach((row, idx) => hotelMediaRows.push({ ...row, hotelId, sortOrder: idx, isPrimary: idx === 0 }));
+    });
+
+    const roomUploadedMedia = roomSlots.map((slots) => slots.filter((row): row is UploadedMediaRow => row !== null));
+
+    return { hotelMediaRows, roomUploadedMedia };
   }
 }
